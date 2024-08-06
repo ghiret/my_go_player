@@ -1,0 +1,55 @@
+[tool.poetry]
+name = "mygobot"
+version = "0.1.0"
+description = "My code implementation for the Deep Learning and The Game of Go book."
+authors = ["Paco"]
+readme = "README.md"
+packages = [{ include = "gobot", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+# Add your production dependencies here
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^6.0"
+# Add other development dependencies here
+
+[tool.poetry.scripts]
+app = "gobot.gobot:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+
+# Remove the pythonpath option from here
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+ignore_missing_imports = true
