@@ -9,6 +9,7 @@ packages = [{ include = "dlgo", from = "src" }]
 [tool.poetry.dependencies]
 python = "^3.8"
 # Add your production dependencies here
+pillow = "^10.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.0"
