@@ -5,7 +5,7 @@ import pytest
 from dlgo.goboard_slow import Board, GameState, Move
 from dlgo.gotypes import Player, Point
 from dlgo.visualizer import GameVisualizer
-from src.utils.board_utils import create_board_from_ascii, print_board
+from misc.board_utils import create_board_from_ascii, print_board
 
 
 def debug_output(debug, state, message, output_dir, visualizer, move_number):
