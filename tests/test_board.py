@@ -100,3 +100,83 @@ def test_liberty_count():
     board.place_stone(Player.black, Point(2, 1))
     go_string = board.get_go_string(Point(2, 2))
     assert go_string.num_liberties == 5
+
+
+def create_board_with_stones():
+    board = Board(7, 7)
+    board.place_stone(Player.black, Point(2, 3))
+    board.place_stone(Player.white, Point(2, 4))
+    board.place_stone(Player.black, Point(3, 2))
+    board.place_stone(Player.white, Point(3, 5))
+    board.place_stone(Player.black, Point(4, 3))
+    board.place_stone(Player.white, Point(4, 4))
+    return board
+
+
+def test_board_equality():
+    # Create two boards with the same configuration
+    board1 = create_board_with_stones()
+    board2 = create_board_with_stones()
+
+    # They should be equal
+    assert board1 == board2, "Boards with the same configuration should be equal"
+
+    # Add a stone to one board
+    board1.place_stone(Player.black, Point(3, 3))
+
+    # They should no longer be equal
+    assert board1 != board2, "Boards with different configurations should not be equal"
+
+    # Add the same stone to the second board
+    board2.place_stone(Player.black, Point(3, 3))
+
+    # They should be equal again
+    assert board1 == board2, "Boards should be equal after adding the same stone"
+
+
+def test_board_equality_with_different_order():
+    board1 = create_board_with_stones()
+    board2 = create_board_with_stones()
+
+    # Add stones in different order
+    board1.place_stone(Player.black, Point(3, 3))
+    board1.place_stone(Player.white, Point(3, 4))
+
+    board2.place_stone(Player.white, Point(3, 4))
+    board2.place_stone(Player.black, Point(3, 3))
+
+    # They should still be equal
+    assert board1 == board2, "Boards should be equal regardless of the order of stone placement"
+
+
+def test_board_inequality():
+    board1 = create_board_with_stones()
+    board2 = create_board_with_stones()
+
+    # Add different stones
+    board1.place_stone(Player.black, Point(3, 3))
+    board2.place_stone(Player.white, Point(3, 3))
+
+    # They should not be equal
+    assert board1 != board2, "Boards with different stone colors at the same position should not be equal"
+
+
+def test_board_equality_after_capture():
+    board1 = Board(5, 5)
+    board2 = Board(5, 5)
+
+    # Set up a capture scenario
+    for board in [board1, board2]:
+        board.place_stone(Player.black, Point(2, 2))
+        board.place_stone(Player.black, Point(3, 1))
+        board.place_stone(Player.white, Point(1, 2))
+        board.place_stone(Player.white, Point(2, 1))
+        board.place_stone(Player.white, Point(2, 3))
+        board.place_stone(Player.white, Point(3, 2))
+
+    # Capture the black stone
+    board1.place_stone(Player.white, Point(3, 3))
+    board2.place_stone(Player.white, Point(3, 3))
+
+    # They should be equal after capture
+    assert board1 == board2, "Boards should be equal after the same capture occurs"

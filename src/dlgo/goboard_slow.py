@@ -113,7 +113,7 @@ class Board:
                     continue
                 if neighbor_string is not string:
                     neighbor_string.add_liberty(point)
-            self._grid[point] = None
+            self._grid.pop(point)
 
     def is_on_grid(self, point):
         return 1 <= point.row <= self.num_rows and 1 <= point.col <= self.num_cols
@@ -129,6 +129,11 @@ class Board:
         if string is None:
             return None
         return string
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, Board) and self.num_rows == other.num_rows and self.num_cols == other.num_cols and self._grid == other._grid
+        )
 
 
 class GameState:

@@ -158,3 +158,69 @@ def test_snapback_not_ko():
 
     if debug:
         print("\nTest completed. Check the 'snapback_test_images' directory for visual output.")
+
+
+def test_ko_violation():
+    debug = False
+    output_dir = "ko_test_images"
+    visualizer = GameVisualizer(cell_size=60, margin=30) if debug else None
+
+    # Initial board setup
+    ascii_board = """
+      1 2 3 4 5 6 7
+    1 . . . . . . .
+    2 . . B W . . .
+    3 . B W . W . .
+    4 . . B W . . .
+    5 . . . . . . .
+    6 . . . . . . .
+    7 . . . . . . .
+    """
+
+    board = create_board_from_ascii(ascii_board)
+    game = GameState(board, Player.black, None, None)
+
+    debug_output(debug, game, "Initial board state", output_dir, visualizer, 0)
+
+    # Black captures white stone
+    move1 = Move.play(Point(3, 4))
+    state1 = game.apply_move(move1)
+
+    debug_output(debug, state1, "After Black captures at (3, 4)", output_dir, visualizer, 1)
+
+    assert state1.board.get(Point(3, 3)) is None, "White stone should be captured"
+    assert state1.board.get(Point(3, 4)) == Player.black, "Black stone should be at (3,4)"
+
+    # White attempts to recapture
+    move2 = Move.play(Point(3, 3))
+
+    # This move should violate the ko rule
+    assert state1.does_move_violate_ko(Player.white, move2), "This move should violate the ko rule"
+
+    # Attempt to apply the move anyway to see if it's prevented
+    assert state1.is_valid_move(move2) is False
+
+    # Verify that White can play elsewhere
+    move3 = Move.play(Point(5, 5))
+    assert state1.is_valid_move(move3), "White should be allowed to play elsewhere"
+
+    state2 = state1.apply_move(move3)
+    debug_output(debug, state2, "After White plays elsewhere at (5, 5)", output_dir, visualizer, 3)
+
+    # Now Black can play elsewhere
+    move4 = Move.play(Point(6, 6))
+    state3 = state2.apply_move(move4)
+    debug_output(debug, state3, "After Black plays elsewhere at (6, 6)", output_dir, visualizer, 4)
+
+    # White should now be able to recapture
+    move5 = Move.play(Point(3, 3))
+    assert not state3.does_move_violate_ko(Player.white, move5), "White should now be allowed to recapture"
+
+    state5 = state3.apply_move(move5)
+    debug_output(debug, state5, "After White recaptures at (3, 2)", output_dir, visualizer, 5)
+
+    assert state5.board.get(Point(3, 3)) == Player.white, "White stone should now be at (3,2)"
+    assert state5.board.get(Point(3, 4)) is None, "Black stone should be captured"
+
+    if debug:
+        print("\nTest completed. Check the 'ko_test_images' directory for visual output.")
