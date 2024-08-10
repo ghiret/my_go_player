@@ -1,3 +1,4 @@
 ignore:
   - src/dlgo/utils.py
   - src/dlgo/visualizer.py
+  - src/scripts/naive_bot_vs_naive_bot.py
