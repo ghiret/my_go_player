@@ -1,14 +1,15 @@
 import pytest
 
+from dlgo.agent.random_bot import RandomBot
 from dlgo.goboard_slow import GameState
 from dlgo.gotypes import Player, Point
-from dlgo.agent.random_bot import RandomBot
 
 
 @pytest.fixture
 def game_state():
     # Initialize a game state with an empty 5x5 board.
     return GameState.new_game(5)
+
 
 def test_select_move_empty_board(game_state):
     bot = RandomBot()
@@ -21,6 +22,7 @@ def test_select_move_empty_board(game_state):
 def test_select_move_avoids_eyes(game_state, monkeypatch):
     bot = RandomBot()
     game_state = GameState.new_game(5)
+
     # Define a mock function to replace `is_point_an_eye`
     def mock_is_point_an_eye(board, point, player):
         return True  # Simulate that every point is an eye.
@@ -33,6 +35,7 @@ def test_select_move_avoids_eyes(game_state, monkeypatch):
 
     # Check if the bot chooses to pass
     assert move.is_pass, "The bot should pass if every point is an eye."
+
 
 def test_select_move_when_no_valid_moves(game_state):
     bot = RandomBot()
@@ -47,4 +50,3 @@ def test_select_move_when_no_valid_moves(game_state):
 
     # Expect a pass move since there are no valid moves.
     assert move.is_pass, "The bot should pass if there are no valid moves."
-

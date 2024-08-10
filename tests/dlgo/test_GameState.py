@@ -1,23 +1,9 @@
-import os
-
 import pytest
 
 from dlgo.goboard_slow import Board, GameState, Move
 from dlgo.gotypes import Player, Point
 from dlgo.visualizer import GameVisualizer
-from misc.board_utils import create_board_from_ascii, print_board
-
-
-def debug_output(debug, state, message, output_dir, visualizer, move_number):
-    print(f"\n{message}")
-    print_board(state.board)
-
-    if debug and visualizer:
-        os.makedirs(output_dir, exist_ok=True)
-        visualizer.visualize_game_state(
-            state,
-            os.path.join(output_dir, f"{move_number:02d}_{message.replace(' ', '_').lower()}.png"),
-        )
+from misc.board_utils import create_board_from_ascii, debug_output
 
 
 @pytest.fixture

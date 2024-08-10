@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [
     { include = "dlgo", from = "src" },
     { include = "scripts", from = "src" },
-    { include = "utils", from = "src" },
+    { include = "misc", from = "src" },
 ]
 
 [tool.poetry.dependencies]
