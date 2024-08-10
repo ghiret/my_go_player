@@ -1,0 +1,3 @@
+ignore:
+  - src/dlgo/utils.py
+  - src/dlgo/visualizer.py
