@@ -2,6 +2,7 @@ import pytest
 
 from dlgo.goboard_slow import Board, GoString
 from dlgo.gotypes import Player, Point
+from misc.board_utils import create_board_from_ascii
 
 
 @pytest.fixture
@@ -46,33 +47,58 @@ def test_place_stone_occupied(empty_board):
 
 
 def test_capture_stone():
-    board = Board(5, 5)
-    board.place_stone(Player.black, Point(2, 2))
-    board.place_stone(Player.white, Point(1, 2))
-    board.place_stone(Player.white, Point(2, 1))
-    board.place_stone(Player.white, Point(2, 3))
-    board.place_stone(Player.white, Point(3, 2))
+
+    ascii_board = """
+      A B C D E
+    1 . W . . .
+    2 W B W . .
+    3 . W . . .
+    4 . . . . .
+    5 . . . . .
+    """
+
+    board = create_board_from_ascii(ascii_board)
     assert board.get(Point(2, 2)) is None
+
+    # White pieces should still be there
+    assert board.get(Point(1, 2)) == Player.white
+    assert board.get(Point(2, 3)) == Player.white
+    assert board.get(Point(2, 1)) == Player.white
+    assert board.get(Point(3, 2)) == Player.white
 
 
 def test_capture_multiple_stones():
-    board = Board(5, 5)
-    board.place_stone(Player.black, Point(2, 2))
-    board.place_stone(Player.black, Point(2, 3))
-    board.place_stone(Player.white, Point(1, 2))
-    board.place_stone(Player.white, Point(1, 3))
-    board.place_stone(Player.white, Point(2, 1))
-    board.place_stone(Player.white, Point(2, 4))
-    board.place_stone(Player.white, Point(3, 2))
-    board.place_stone(Player.white, Point(3, 3))
+    ascii_board = """
+      A B C D E
+    1 . W W . .
+    2 W B B W .
+    3 . W W . .
+    4 . . . . .
+    5 . . . . .
+    """
+    board = create_board_from_ascii(ascii_board)
     assert board.get(Point(2, 2)) is None
     assert board.get(Point(2, 3)) is None
 
+    # White pieces should still be there
+    assert board.get(Point(1, 2)) == Player.white
+    assert board.get(Point(1, 3)) == Player.white
+    assert board.get(Point(2, 1)) == Player.white
+    assert board.get(Point(2, 4)) == Player.white
+    assert board.get(Point(3, 2)) == Player.white
+    assert board.get(Point(3, 3)) == Player.white
+
 
 def test_get_go_string():
-    board = Board(5, 5)
-    board.place_stone(Player.black, Point(2, 2))
-    board.place_stone(Player.black, Point(2, 3))
+    ascii_board = """
+      A B C D E
+    1 . . . . .
+    2 . B B . .
+    3 . . . . .
+    4 . . . . .
+    5 . . . . .
+    """
+    board = create_board_from_ascii(ascii_board)
     go_string = board.get_go_string(Point(2, 2))
     assert isinstance(go_string, GoString)
     assert go_string.color == Player.black
@@ -81,10 +107,16 @@ def test_get_go_string():
 
 
 def test_merge_go_strings():
-    board = Board(5, 5)
-    board.place_stone(Player.black, Point(2, 2))
-    board.place_stone(Player.black, Point(2, 3))
-    board.place_stone(Player.black, Point(2, 4))
+
+    ascii_board = """
+      A B C D E
+    1 . . . . .
+    2 . B B B .
+    3 . . . . .
+    4 . . . . .
+    5 . . . . .
+    """
+    board = create_board_from_ascii(ascii_board)
     go_string = board.get_go_string(Point(2, 2))
     assert len(go_string.stones) == 3
     assert Point(2, 2) in go_string.stones
@@ -93,23 +125,35 @@ def test_merge_go_strings():
 
 
 def test_liberty_count():
-    board = Board(5, 5)
-    board.place_stone(Player.black, Point(2, 2))
+    ascii_board = """
+      A B C D E
+    1 . . . . .
+    2 . B . . .
+    3 . . . . .
+    4 . . . . .
+    5 . . . . .
+    """
+    board = create_board_from_ascii(ascii_board)
     go_string = board.get_go_string(Point(2, 2))
     assert go_string.num_liberties == 4
+
     board.place_stone(Player.black, Point(2, 1))
     go_string = board.get_go_string(Point(2, 2))
     assert go_string.num_liberties == 5
 
 
 def create_board_with_stones():
-    board = Board(7, 7)
-    board.place_stone(Player.black, Point(2, 3))
-    board.place_stone(Player.white, Point(2, 4))
-    board.place_stone(Player.black, Point(3, 2))
-    board.place_stone(Player.white, Point(3, 5))
-    board.place_stone(Player.black, Point(4, 3))
-    board.place_stone(Player.white, Point(4, 4))
+    ascii_board = """
+      A B C D E F G
+    1 . . . . . . .
+    2 . . B W . . .
+    3 . B . . W . .
+    4 . . B W . . .
+    5 . . . . . . .
+    6 . . . . . . .
+    7 . . . . . . .
+    """
+    board = create_board_from_ascii(ascii_board)
     return board
 
 

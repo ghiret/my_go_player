@@ -10,8 +10,8 @@ def create_board_from_ascii(ascii_board):
     if len(lines) < 2:
         raise ValueError("Invalid board: not enough lines")
 
-    # Remove the column numbers line if it exists
-    if all(c.isdigit() or c.isspace() for c in lines[0]):
+    # Remove the column letters line if it exists
+    if all(c.isalpha() or c.isspace() for c in lines[0]):
         lines = lines[1:]
 
     # Determine board size
@@ -39,7 +39,10 @@ def create_board_from_ascii(ascii_board):
 
 def print_board(board):
     board_size = board.num_rows  # Assuming square board
-    print("  " + " ".join(str(i) for i in range(1, board_size + 1)))
+    # Generate column labels (A-H, J-Z)
+    column_labels = [chr(i) for i in range(ord("A"), ord("A") + board_size) if chr(i) != "I"]
+
+    print("  " + " ".join(column_labels[:board_size]))
     for row in range(1, board_size + 1):
         line = f"{row} "
         for col in range(1, board_size + 1):

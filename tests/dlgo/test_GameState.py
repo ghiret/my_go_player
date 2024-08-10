@@ -82,11 +82,18 @@ def test_is_over_after_two_passes(new_game):
 
 
 def test_is_move_self_capture():
-    board = Board(5, 5)
-    board.place_stone(Player.white, Point(1, 2))
-    board.place_stone(Player.white, Point(2, 1))
-    board.place_stone(Player.white, Point(2, 3))
-    board.place_stone(Player.white, Point(3, 2))
+
+    ascii_board = """
+      A B C D E
+    1 . W . . .
+    2 W . W . .
+    3 . W . . .
+    4 . . . . .
+    5 . . . . .
+    """
+
+    board = create_board_from_ascii(ascii_board)
+
     game = GameState(board, Player.black, None, None)
     move = Move.play(Point(2, 2))
     assert game.is_move_self_capture(Player.black, move)
@@ -108,7 +115,7 @@ def test_snapback_not_ko():
 
     # Initial board setup for snapback
     ascii_board = """
-      1 2 3 4 5 6 7
+      A B C D E F G
     1 . . . . . . .
     2 . . . . . . .
     3 . . . . . . .
@@ -184,7 +191,7 @@ def test_ko_violation():
 
     # Initial board setup
     ascii_board = """
-      1 2 3 4 5 6 7
+      A B C D E F G
     1 . . . . . . .
     2 . . B W . . .
     3 . B W . W . .
