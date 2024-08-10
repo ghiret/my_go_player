@@ -1,6 +1,6 @@
 from .gotypes import Player, Point
 
-__all__ = ['HASH_CODE', 'EMPTY_BOARD']
+__all__ = ["HASH_CODE", "EMPTY_BOARD"]
 
 HASH_CODE = {
     (Point(row=1, col=1), None): 1737168495190103014,
