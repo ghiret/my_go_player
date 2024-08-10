@@ -1,3 +1,4 @@
+# Copied from https://github.com/maxpumperla/deep_learning_and_the_game_of_go/blob/master/code/dlgo/utils.py
 # tag::print_utils[]
 from dlgo import gotypes
 

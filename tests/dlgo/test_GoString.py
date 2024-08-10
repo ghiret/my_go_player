@@ -11,24 +11,28 @@ def test_gostring_init():
     assert gostring.liberties == {Point(1, 2), Point(2, 1)}
 
 
-def test_remove_liberty():
+def test_without_liberty():
     gostring = GoString(Player.black, {Point(1, 1)}, {Point(1, 2), Point(2, 1)})
-    gostring.remove_liberty(Point(1, 2))
+    new_gostring = gostring.without_liberty(Point(1, 2))
 
-    assert gostring.liberties == {Point(2, 1)}
+    assert new_gostring.liberties == {Point(2, 1)}
+    # Check that the original gostring still has all the liberties.
+    assert gostring.liberties == {Point(1, 2), Point(2, 1)}
 
 
-def test_remove_nonexistent_liberty():
+def test_without_liberty_nonexistent_liberty():
     gostring = GoString(Player.black, {Point(1, 1)}, {Point(1, 2), Point(2, 1)})
     with pytest.raises(ValueError):
-        gostring.remove_liberty(Point(3, 3))
+        gostring.without_liberty(Point(3, 3))
 
 
-def test_add_liberty():
+def test_with_liberty():
     gostring = GoString(Player.black, {Point(1, 1)}, {Point(1, 2)})
 
-    gostring.add_liberty(Point(2, 1))
-    assert gostring.liberties == {Point(1, 2), Point(2, 1)}
+    new_gostring = gostring.with_liberty(Point(2, 1))
+    assert new_gostring.liberties == {Point(1, 2), Point(2, 1)}
+    # The old liberty should still have the the single liberty.
+    assert gostring.liberties == {Point(1, 2)}
 
 
 def test_merged_with():
