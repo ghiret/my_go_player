@@ -1,7 +1,7 @@
 import pytest
 
-from dlgo.go_types import Player, Point
 from dlgo.goboard_slow import Board, GoString
+from dlgo.gotypes import Player, Point
 
 
 @pytest.fixture

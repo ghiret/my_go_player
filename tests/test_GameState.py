@@ -2,8 +2,8 @@ import os
 
 import pytest
 
-from dlgo.go_types import Player, Point
 from dlgo.goboard_slow import Board, GameState, Move
+from dlgo.gotypes import Player, Point
 from dlgo.visualizer import GameVisualizer
 from utils.board_utils import create_board_from_ascii, print_board
 
@@ -16,9 +16,7 @@ def debug_output(debug, state, message, output_dir, visualizer, move_number):
         os.makedirs(output_dir, exist_ok=True)
         visualizer.visualize_game_state(
             state,
-            os.path.join(
-                output_dir, f"{move_number:02d}_{message.replace(' ', '_').lower()}.png"
-            ),
+            os.path.join(output_dir, f"{move_number:02d}_{message.replace(' ', '_').lower()}.png"),
         )
 
 
@@ -121,25 +119,19 @@ def test_snapback_not_ko():
     move1 = Move.play(Point(7, 5))
     state1 = game.apply_move(move1)
 
-    debug_output(
-        debug, state1, "After Black captures at (7, 5)", output_dir, visualizer, 1
-    )
+    debug_output(debug, state1, "After Black captures at (7, 5)", output_dir, visualizer, 1)
 
     # White plays, creating a snapback situation
     move2 = Move.play(Point(7, 4))
     state2 = state1.apply_move(move2)
 
-    debug_output(
-        debug, state2, "After White plays at (7, 4)", output_dir, visualizer, 2
-    )
+    debug_output(debug, state2, "After White plays at (7, 4)", output_dir, visualizer, 2)
 
     # Black captures the white group by playing at the 'mouth' of the snapback
     move3 = Move.play(Point(6, 5))
     state3 = state2.apply_move(move3)
 
-    debug_output(
-        debug, state3, "After Black plays at (6, 5)", output_dir, visualizer, 3
-    )
+    debug_output(debug, state3, "After Black plays at (6, 5)", output_dir, visualizer, 3)
 
     # Add these debug prints
     if debug:
@@ -147,34 +139,22 @@ def test_snapback_not_ko():
         print("Stone at (6, 4):", state3.board.get(Point(6, 4)))
         print("Stone at (6, 5):", state3.board.get(Point(6, 5)))
 
-    assert (
-        state3.board.get(Point(7, 4)) is Player.white
-    ), "White stone should still be at (7,4)"
+    assert state3.board.get(Point(7, 4)) is Player.white, "White stone should still be at (7,4)"
     assert state3.board.get(Point(6, 4)) is None, "This should still be empty"
-    assert (
-        state3.board.get(Point(6, 5)) == Player.black
-    ), "Black's move should be at (6,5)"
+    assert state3.board.get(Point(6, 5)) == Player.black, "Black's move should be at (6,5)"
 
-    assert not state2.does_move_violate_ko(
-        Player.black, move3
-    ), "Snapback should not violate ko rule"
+    assert not state2.does_move_violate_ko(Player.black, move3), "Snapback should not violate ko rule"
 
     # Verify that White cannot immediately recapture
     move4 = Move.play(Point(7, 5))
     assert state3.is_valid_move(move4), "White should be allowed to play at (7,5)"
     state4 = state3.apply_move(move4)
 
-    debug_output(
-        debug, state4, "After White plays at (7, 5)", output_dir, visualizer, 4
-    )
+    debug_output(debug, state4, "After White plays at (7, 5)", output_dir, visualizer, 4)
 
     # Black can now safely fill the eye
     move5 = Move.play(Point(6, 4))
-    assert not state4.is_valid_move(
-        move5
-    ), "Black should not be allowed to self-capture"
+    assert not state4.is_valid_move(move5), "Black should not be allowed to self-capture"
 
     if debug:
-        print(
-            "\nTest completed. Check the 'snapback_test_images' directory for visual output."
-        )
+        print("\nTest completed. Check the 'snapback_test_images' directory for visual output.")

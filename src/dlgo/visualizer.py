@@ -2,8 +2,8 @@ import os
 
 from PIL import Image, ImageDraw, ImageFont
 
-from dlgo.go_types import Player, Point
 from dlgo.goboard_slow import GameState
+from dlgo.gotypes import Player, Point
 
 
 class GameVisualizer:
@@ -12,9 +12,7 @@ class GameVisualizer:
         self.margin = margin
 
         # Create a font object (you may need to adjust the path to a font file)
-        self.font = ImageFont.truetype(
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 14
-        )
+        self.font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 14)
 
     def _create_empty_board(self, num_rows, num_cols):
         image_width = 2 * self.margin + self.cell_size * (num_cols - 1)

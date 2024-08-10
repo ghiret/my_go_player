@@ -1,5 +1,5 @@
-from dlgo.go_types import Player, Point
 from dlgo.goboard_slow import Board
+from dlgo.gotypes import Player, Point
 
 
 def create_board_from_ascii(ascii_board):
@@ -30,9 +30,7 @@ def create_board_from_ascii(ascii_board):
             elif stone == "W":
                 board.place_stone(Player.white, Point(row, col))
             elif stone != ".":
-                raise ValueError(
-                    f"Invalid character '{stone}' at position ({row}, {col})"
-                )
+                raise ValueError(f"Invalid character '{stone}' at position ({row}, {col})")
 
     return board
 

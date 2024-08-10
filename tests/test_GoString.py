@@ -1,7 +1,7 @@
 import pytest
 
-from dlgo.go_types import Player, Point
 from dlgo.goboard_slow import GoString
+from dlgo.gotypes import Player, Point
 
 
 def test_gostring_init():

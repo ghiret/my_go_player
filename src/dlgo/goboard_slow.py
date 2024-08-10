@@ -2,13 +2,11 @@ from __future__ import annotations
 
 import copy
 
-from dlgo.go_types import Player, Point
+from dlgo.gotypes import Player, Point
 
 
 class Move:
-    def __init__(
-        self, point: Point = None, is_pass: bool = False, is_resign: bool = False
-    ):
+    def __init__(self, point: Point = None, is_pass: bool = False, is_resign: bool = False):
         assert (point is not None) ^ is_pass ^ is_resign
         self.point = point
         self.is_play = self.point is not None
@@ -59,11 +57,7 @@ class GoString:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, GoString):
             return NotImplemented
-        return (
-            self.color == other.color
-            and self.stones == other.stones
-            and self.liberties == other.liberties
-        )
+        return self.color == other.color and self.stones == other.stones and self.liberties == other.liberties
 
     def __hash__(self) -> int:
         return hash((self.color, self.stones, self.liberties))
@@ -138,9 +132,7 @@ class Board:
 
 
 class GameState:
-    def __init__(
-        self, board: Board, next_player: Player, previous: GameState, move: Move
-    ):
+    def __init__(self, board: Board, next_player: Player, previous: GameState, move: Move):
         self.board = board
         self.next_player = next_player
         self.previous_state = previous

@@ -19,3 +19,11 @@ class Point(namedtuple("Point", "row col")):
             Point(self.row, self.col - 1),
             Point(self.row, self.col + 1),
         ]
+
+    def corners(self):
+        return [
+            Point(self.row - 1, self.col - 1),
+            Point(self.row - 1, self.col + 1),
+            Point(self.row + 1, self.col - 1),
+            Point(self.row + 1, self.col + 1),
+        ]

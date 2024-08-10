@@ -3,8 +3,8 @@ from io import StringIO
 
 import pytest
 
-from dlgo.go_types import Player, Point
 from dlgo.goboard_slow import Board
+from dlgo.gotypes import Player, Point
 from utils.board_utils import create_board_from_ascii, print_board
 
 
@@ -164,6 +164,7 @@ def test_print_larger_board():
 """.strip()
     actual_output = capture_print_output(print_board, board)
     assert actual_output == expected_output
+
 
 def test_print_board_with_single_stone():
     board = Board(3, 3)

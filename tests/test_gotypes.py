@@ -1,6 +1,6 @@
 # test_dlgo.py
 
-from dlgo.go_types import Player, Point
+from dlgo.gotypes import Player, Point
 
 
 def test_player_black_other():
