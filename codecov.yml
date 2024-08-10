@@ -1,4 +1,5 @@
 ignore:
   - src/dlgo/visualizer.py
-  - src/scripts/naive_bot_vs_naive_bot.py
-  - src/scripts/human_vs_naive_bot.py
+  - src/scripts/random_bot_vs_random_bot.py
+  - src/scripts/human_vs_random_bot.py
+  - src/scripts/generate_zobrist.py
