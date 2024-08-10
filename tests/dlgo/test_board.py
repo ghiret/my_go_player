@@ -113,6 +113,14 @@ def create_board_with_stones():
     return board
 
 
+def test_get_go_string_with_None_():
+    board = Board(3, 3)
+
+    go_string = board.get_go_string(None)
+
+    assert go_string is None
+
+
 def test_board_equality():
     # Create two boards with the same configuration
     board1 = create_board_with_stones()

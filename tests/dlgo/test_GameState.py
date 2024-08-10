@@ -49,15 +49,34 @@ def test_is_over_new_game(new_game):
     assert not new_game.is_over()
 
 
-def test_is_over_after_resign():
-    game = GameState.new_game(19)
-    next_state = game.apply_move(Move.resign())
+def test_is_over_after_resign(new_game):
+
+    next_state = new_game.apply_move(Move.resign())
     assert next_state.is_over()
 
 
-def test_is_over_after_two_passes():
-    game = GameState.new_game(19)
-    next_state = game.apply_move(Move.pass_turn())
+def test_is_valid_move_after_resign(new_game):
+
+    move_resign = Move.resign()
+
+    assert new_game.is_valid_move(move_resign)
+    next_state = new_game.apply_move(move_resign)
+
+    move_pass = Move.pass_turn()
+    assert not next_state.is_valid_move(move_pass)
+
+
+def test_is_valid_move_with_a_pass(new_game):
+
+    next_state = new_game.apply_move(Move.resign())
+
+    move_pass = Move.pass_turn()
+    assert not next_state.is_valid_move(move_pass)
+
+
+def test_is_over_after_two_passes(new_game):
+
+    next_state = new_game.apply_move(Move.pass_turn())
     final_state = next_state.apply_move(Move.pass_turn())
     assert final_state.is_over()
 
@@ -71,6 +90,9 @@ def test_is_move_self_capture():
     game = GameState(board, Player.black, None, None)
     move = Move.play(Point(2, 2))
     assert game.is_move_self_capture(Player.black, move)
+
+    move_pass = Move.pass_turn()
+    assert not game.is_move_self_capture(Player.black, move_pass)
 
 
 def test_situation():
@@ -144,6 +166,15 @@ def test_snapback_not_ko():
 
     if debug:
         print("\nTest completed. Check the 'snapback_test_images' directory for visual output.")
+
+
+def test_does_move_violate_ko_with_non_play_move():
+    board = Board(5, 5)
+
+    game = GameState(board, Player.black, None, None)
+
+    move_pass = Move.pass_turn()
+    assert not game.does_move_violate_ko(Player.black, move_pass)
 
 
 def test_ko_violation():
