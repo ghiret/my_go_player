@@ -1,11 +1,10 @@
 from contextlib import redirect_stdout
 from io import StringIO
-
 import pytest
 
 from dlgo.goboard_slow import Board
 from dlgo.gotypes import Player, Point
-from utils.board_utils import create_board_from_ascii, print_board
+from src.utils.board_utils import create_board_from_ascii, print_board
 
 
 def test_create_empty_board():
