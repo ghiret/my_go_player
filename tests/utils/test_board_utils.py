@@ -10,7 +10,7 @@ from misc.board_utils import create_board_from_ascii, print_board
 
 def test_create_empty_board():
     ascii_board = """
-      1 2 3
+      A B C
     1 . . .
     2 . . .
     3 . . .
@@ -25,7 +25,7 @@ def test_create_empty_board():
 
 def test_create_board_with_stones():
     ascii_board = """
-      1 2 3
+      A B C
     1 B . W
     2 . B .
     3 W . B
@@ -41,7 +41,7 @@ def test_create_board_with_stones():
 
 def test_create_larger_board():
     ascii_board = """
-      1 2 3 4 5
+      A B C D E
     1 . . . . .
     2 . B W . .
     3 . B W . .
@@ -58,7 +58,7 @@ def test_create_larger_board():
 
 def test_create_board_with_extra_whitespace():
     ascii_board = """
-        1   2   3
+        A   B   C
     1   .   .   .
     2   B   .   W
     3   .   .   .
@@ -85,7 +85,7 @@ def test_create_board_without_column_numbers():
 
 def test_create_board_with_invalid_characters():
     ascii_board = """
-      1 2 3
+      A B C
     1 X . O
     2 . Y .
     3 Z . Q
@@ -96,7 +96,7 @@ def test_create_board_with_invalid_characters():
 
 def test_create_board_with_inconsistent_rows():
     ascii_board = """
-      1 2 3
+      A B C
     1 . . .
     2 . . . .
     3 . .
@@ -126,7 +126,7 @@ def capture_print_output(func, *args, **kwargs):
 def test_print_empty_board():
     board = Board(3, 3)
     expected_output = """
-  1 2 3
+  A B C
 1 . . .
 2 . . .
 3 . . .
@@ -141,7 +141,7 @@ def test_print_board_with_stones():
     board.place_stone(Player.white, Point(2, 2))
     board.place_stone(Player.black, Point(3, 3))
     expected_output = """
-  1 2 3
+  A B C
 1 B . .
 2 . W .
 3 . . B
@@ -155,7 +155,7 @@ def test_print_larger_board():
     board.place_stone(Player.black, Point(1, 1))
     board.place_stone(Player.white, Point(5, 5))
     expected_output = """
-  1 2 3 4 5
+  A B C D E
 1 B . . . .
 2 . . . . .
 3 . . . . .
@@ -170,7 +170,7 @@ def test_print_board_with_single_stone():
     board = Board(3, 3)
     board.place_stone(Player.black, Point(2, 2))
     expected_output = """
-  1 2 3
+  A B C
 1 . . .
 2 . B .
 3 . . .
@@ -186,7 +186,7 @@ def test_print_board_with_edge_stones():
     board.place_stone(Player.black, Point(3, 1))
     board.place_stone(Player.white, Point(3, 3))
     expected_output = """
-  1 2 3
+  A B C
 1 B . W
 2 . . .
 3 B . W

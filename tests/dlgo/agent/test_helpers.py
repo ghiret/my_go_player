@@ -9,7 +9,7 @@ def test_is_point_an_eye_on_occupied_point():
 
     # Initial board setup
     ascii_board = """
-      1 2 3
+      A B C
     1 B . .
     2 . . .
     3 . . .
@@ -25,7 +25,7 @@ def test_is_point_an_eye():
 
     # Initial board setup
     ascii_board = """
-      1 2 3 4 5
+      A B C D E
     1 . . . . .
     2 . . . . .
     3 . B B B B
@@ -52,7 +52,7 @@ def test_is_point_an_eye_with_eyes_in_the_middle():
 
     # Initial board setup
     ascii_board = """
-      1 2 3 4 5 6 7 8
+      A B C D E F G H
     1 . . . . . . . .
     2 . . B B B B . B
     3 . . B W W W B .

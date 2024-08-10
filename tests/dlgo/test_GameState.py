@@ -108,7 +108,7 @@ def test_snapback_not_ko():
 
     # Initial board setup for snapback
     ascii_board = """
-      1 2 3 4 5 6 7
+      A B C D E F G
     1 . . . . . . .
     2 . . . . . . .
     3 . . . . . . .
@@ -184,7 +184,7 @@ def test_ko_violation():
 
     # Initial board setup
     ascii_board = """
-      1 2 3 4 5 6 7
+      A B C D E F G
     1 . . . . . . .
     2 . . B W . . .
     3 . B W . W . .
