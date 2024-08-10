@@ -1,21 +1,26 @@
 [tool.poetry]
-name = "mygobot"
+name = "mydlgo"
 version = "0.1.0"
 description = "My code implementation for the Deep Learning and The Game of Go book."
 authors = ["Paco"]
 readme = "README.md"
-packages = [{ include = "gobot", from = "src" }]
+packages = [
+    { include = "dlgo", from = "src" },
+    { include = "scripts", from = "src" },
+    { include = "utils", from = "src" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
 # Add your production dependencies here
+pillow = "^10.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.0"
 # Add other development dependencies here
 
 [tool.poetry.scripts]
-app = "gobot.gobot:main"
+app = "dlgo.dlgo:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
