@@ -1,1 +1,1 @@
-from .naive import RandomBot
+from .random_bot import RandomBot

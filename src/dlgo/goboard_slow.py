@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import copy
+from typing import Optional
 
 from dlgo.gotypes import Player, Point
 
 
 class Move:
-    def __init__(self, point: Point = None, is_pass: bool = False, is_resign: bool = False):
+    def __init__(self, point: Optional[Point] = None, is_pass: bool = False, is_resign: bool = False):
         assert (point is not None) ^ is_pass ^ is_resign
         self.point = point
         self.is_play = self.point is not None

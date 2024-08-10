@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [
     { include = "dlgo", from = "src" },
     { include = "scripts", from = "src" },
-    { include = "utils", from = "src" },
+    { include = "misc", from = "src" },
 ]
 
 [tool.poetry.dependencies]
@@ -56,3 +56,6 @@ profile = "black"
 
 [tool.mypy]
 ignore_missing_imports = true
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = "src"
