@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import copy
-from typing import Optional
+from typing import FrozenSet, Optional, Tuple
 
+import dlgo.zobrist as zobrist
 from dlgo.gotypes import Player, Point
 
 
@@ -30,16 +31,19 @@ class Move:
 class GoString:
     def __init__(self, color, stones, liberties):
         self.color = color
-        self.stones = set(stones)
-        self.liberties = set(liberties)
+        self.stones = frozenset(stones)
+        self.liberties = frozenset(liberties)
 
-    def remove_liberty(self, point: Point):
+    def without_liberty(self, point: Point):
         if point not in self.liberties:
             raise ValueError(f"Point {point} is not a liberty of this string")
-        self.liberties.remove(point)
+        new_liberties = self.liberties - set([point])
 
-    def add_liberty(self, point: Point):
-        self.liberties.add(point)
+        return GoString(self.color, self.stones, new_liberties)
+
+    def with_liberty(self, point: Point):
+        new_liberties = self.liberties | set([point])
+        return GoString(self.color, self.stones, new_liberties)
 
     def merged_with(self, go_string: GoString) -> GoString:
         if self.color != go_string.color:
@@ -69,6 +73,10 @@ class Board:
         self.num_rows = num_rows
         self.num_cols = num_cols
         self._grid = {}
+        self._hash = zobrist.EMPTY_BOARD
+
+    def zobrist_hash(self):
+        return self._hash
 
     def place_stone(self, player, point):
         assert self.is_on_grid(point)
@@ -100,11 +108,19 @@ class Board:
             new_string = new_string.merged_with(same_color_string)
         for new_string_point in new_string.stones:
             self._grid[new_string_point] = new_string
+
+        self._hash ^= zobrist.HASH_CODE[point, player]
+
         for other_color_string in adjacent_opposite_color:
-            other_color_string.remove_liberty(point)
-        for other_color_string in adjacent_opposite_color:
-            if other_color_string.num_liberties == 0:
+            replacement = other_color_string.without_liberty(point)
+            if replacement.num_liberties:
+                self._replace_string(other_color_string.without_liberty(point))
+            else:
                 self._remove_string(other_color_string)
+
+    def _replace_string(self, new_string: GoString):
+        for point in new_string.stones:
+            self._grid[point] = new_string
 
     def _remove_string(self, string):
         for point in string.stones:
@@ -113,8 +129,10 @@ class Board:
                 if neighbor_string is None:
                     continue
                 if neighbor_string is not string:
-                    neighbor_string.add_liberty(point)
+                    self._replace_string(neighbor_string.with_liberty(point))
             self._grid.pop(point)
+
+            self._hash ^= zobrist.HASH_CODE[point, string.color]
 
     def is_on_grid(self, point):
         return 1 <= point.row <= self.num_rows and 1 <= point.col <= self.num_cols
@@ -138,10 +156,20 @@ class Board:
 
 
 class GameState:
-    def __init__(self, board: Board, next_player: Player, previous: GameState, move: Move):
+    previous_states: FrozenSet[Tuple[Player, int]]  # Add type annotation
+
+    def __init__(self, board: Board, next_player: Player, previous_gamestate: GameState, move: Move):
         self.board = board
         self.next_player = next_player
-        self.previous_state = previous
+        self.previous_state = previous_gamestate
+
+        if self.previous_state is None:
+            self.previous_states = frozenset()
+        else:
+            self.previous_states = frozenset(
+                previous_gamestate.previous_states
+                | {(previous_gamestate.next_player, previous_gamestate.board.zobrist_hash())}  # type: ignore[attr-defined]
+            )
         self.last_move = move
 
     def apply_move(self, move: Move):
@@ -187,13 +215,8 @@ class GameState:
 
         next_board = copy.deepcopy(self.board)
         next_board.place_stone(player, move.point)
-        next_situation = (player.other, next_board)
-        past_state = self.previous_state
-        while past_state is not None:
-            if past_state.situation == next_situation:
-                return True
-            past_state = past_state.previous_state
-        return False
+        next_situation = (player.other, next_board.zobrist_hash())
+        return next_situation in self.previous_states
 
     def is_valid_move(self, move: Move):
         if self.is_over():
