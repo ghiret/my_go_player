@@ -4,7 +4,11 @@ version = "0.1.0"
 description = "My code implementation for the Deep Learning and The Game of Go book."
 authors = ["Paco"]
 readme = "README.md"
-packages = [{ include = "dlgo", from = "src" }]
+packages = [
+    { include = "dlgo", from = "src" },
+    { include = "scripts", from = "src" },
+    { include = "utils", from = "src" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"

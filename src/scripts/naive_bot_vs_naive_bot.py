@@ -7,7 +7,7 @@ from dlgo import gotypes, utils
 
 def main():
     board_size = 9
-    game = goboard.Gamestate.new_game(board_size)
+    game = goboard.GameState.new_game(board_size)
 
     bots = {gotypes.Player.black: agent.naive.RandomBot(), gotypes.Player.white: agent.naive.RandomBot()}
 
