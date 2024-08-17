@@ -248,3 +248,122 @@ def test_ko_violation():
 
     if debug:
         print("\nTest completed. Check the 'ko_test_images' directory for visual output.")
+
+
+def test_empty_board_legal_moves():
+    board = Board(5, 5)
+    game = GameState(board, Player.black, None, None)
+    legal_moves = game.legal_moves()
+
+    assert len(legal_moves) == 27  # 5x5 board + pass + resign
+
+
+def test_full_board_legal_moves():
+    ascii_board = """
+      A B C D E
+    1 B W B W B
+    2 W B W B W
+    3 B W B W B
+    4 W B W B W
+    5 B W B W B
+    """
+    board = create_board_from_ascii(ascii_board)
+    game = GameState(board, Player.black, None, None)
+    legal_moves = game.legal_moves()
+
+    assert len(legal_moves) == 2  # only pass and resign are legal
+
+
+def test_some_legal_moves():
+    ascii_board = """
+      A B C D E
+    1 . W . . .
+    2 W . W . .
+    3 . W . . .
+    4 . . . . .
+    5 . . . . .
+    """
+    board = create_board_from_ascii(ascii_board)
+    game = GameState(board, Player.black, None, None)
+    legal_moves = game.legal_moves()
+
+    assert len(legal_moves) > 0  # more than just pass and resign
+    assert Move.play(Point(1, 3)) in legal_moves
+    assert Move.play(Point(2, 2)) not in legal_moves  # self-capture
+
+
+def test_ko_rule():
+    ascii_board = """
+      A B C D E
+    1 . B . . .
+    2 B . B . .
+    3 . B . . .
+    4 . . . . .
+    5 . . . . .
+    """
+    board = create_board_from_ascii(ascii_board)
+    game_state = GameState(board, Player.white, None, None)
+
+    # ko rule prevents this move
+    assert Move.play(Point(2, 2)) not in game_state.legal_moves()
+
+
+def test_edge_cases():
+    ascii_board = """
+      A B C
+    1 B . B
+    2 . . .
+    3 B . B
+    """
+    board = create_board_from_ascii(ascii_board)
+    game = GameState(board, Player.black, None, None)
+    legal_moves = game.legal_moves()
+
+    assert len(legal_moves) == 7  # 5 valid plays + pass + resign
+    assert Move.play(Point(1, 2)) in legal_moves
+    assert Move.play(Point(2, 1)) in legal_moves
+    assert Move.play(Point(2, 2)) in legal_moves
+    assert Move.play(Point(2, 3)) in legal_moves
+    assert Move.play(Point(3, 2)) in legal_moves
+
+
+def test_legal_moves_different_players():
+    ascii_board = """
+      A B C
+    1 B . .
+    2 . W .
+    3 . . .
+    """
+    board = create_board_from_ascii(ascii_board)
+    game_black = GameState(board, Player.black, None, None)
+    game_white = GameState(board, Player.white, None, None)
+
+    legal_moves_black = game_black.legal_moves()
+    legal_moves_white = game_white.legal_moves()
+
+    assert len(legal_moves_black) == len(legal_moves_white)
+    assert Move.play(Point(1, 1)) not in legal_moves_black
+    assert Move.play(Point(1, 1)) not in legal_moves_white
+    assert Move.play(Point(2, 2)) not in legal_moves_black
+    assert Move.play(Point(2, 2)) not in legal_moves_white
+
+
+# Helper function to count specific move types
+
+
+def count_move_types(moves):
+    play_moves = sum(1 for move in moves if move.is_play)
+    pass_moves = sum(1 for move in moves if move.is_pass)
+    resign_moves = sum(1 for move in moves if move.is_resign)
+    return play_moves, pass_moves, resign_moves
+
+
+def test_move_types():
+    board = Board(5, 5)
+    game = GameState(board, Player.black, None, None)
+    legal_moves = game.legal_moves()
+
+    play_moves, pass_moves, resign_moves = count_move_types(legal_moves)
+    assert play_moves == 25  # 5x5 board
+    assert pass_moves == 1
+    assert resign_moves == 1
