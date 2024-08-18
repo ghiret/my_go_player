@@ -10,23 +10,17 @@ repos:
       - id: debug-statements
       - id: check-added-large-files
 
-  - repo: https://github.com/psf/black
-    rev: 24.8.0
-    hooks:
-      - id: black
-        args: [--safe, --quiet, --line-length=140]
-
-  - repo: https://github.com/PyCQA/isort
+  - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
       - id: isort
         args: [--profile=black, --line-length=140]
 
-  - repo: https://github.com/hhatto/autopep8
-    rev: v2.3.1
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
     hooks:
-    - id: autopep8
-      args: [--in-place, --aggressive, --aggressive, --max-line-length=140]
+      - id: black
+        args: [--safe, --quiet, --line-length=140]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.11.1

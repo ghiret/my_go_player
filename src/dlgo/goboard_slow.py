@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import FrozenSet, Optional, Tuple
+from typing import FrozenSet, List, Optional, Tuple
 
 import dlgo.zobrist as zobrist
 from dlgo.gotypes import Player, Point
@@ -26,6 +26,14 @@ class Move:
     @classmethod
     def resign(cls) -> Move:
         return Move(is_resign=True)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Move):
+            return NotImplemented
+        return (self.point, self.is_pass, self.is_resign) == (other.point, other.is_pass, other.is_resign)
+
+    def __hash__(self) -> int:
+        return hash((self.point, self.is_pass, self.is_resign))
 
 
 class GoString:
@@ -168,7 +176,8 @@ class GameState:
         else:
             self.previous_states = frozenset(
                 previous_gamestate.previous_states
-                | {(previous_gamestate.next_player, previous_gamestate.board.zobrist_hash())}  # type: ignore[attr-defined]
+                # type: ignore[attr-defined]
+                | {(previous_gamestate.next_player, previous_gamestate.board.zobrist_hash())}
             )
         self.last_move = move
 
@@ -229,3 +238,16 @@ class GameState:
             and not self.does_move_violate_ko(self.next_player, move)
             and not self.is_move_self_capture(self.next_player, move)
         )
+
+    def legal_moves(self) -> List[Move]:
+
+        legal_moves = []
+        for row in range(1, self.board.num_rows + 1):
+            for col in range(1, self.board.num_cols + 1):
+                point = Point(row, col)
+                move = Move.play(point)
+                if self.is_valid_move(move):
+                    legal_moves.append(move)
+        legal_moves.append(Move.pass_turn())
+        legal_moves.append(Move.resign())
+        return legal_moves
