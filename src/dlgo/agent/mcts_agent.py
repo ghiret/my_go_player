@@ -3,6 +3,7 @@ from typing import List
 
 from dlgo.agent import base
 from dlgo.agent.mcts_node import MCTSNode
+from dlgo.agent.random_bot import RandomBot
 from dlgo.goboard_slow import GameState
 from dlgo.gotypes import Player
 
@@ -71,5 +72,14 @@ class MCTSAgent(base.Agent):
                 best_child = child
         return best_child
 
-    def simulate_random_game(self, game_state):
-        pass
+    def simulate_random_game(self, game_state: GameState):
+
+        bots = {Player.black: RandomBot(), Player.white: RandomBot()}
+
+        while not game_state.is_over():
+
+            bot_move = bots[game_state.next_player].select_move(game_state)
+
+            game_state = game_state.apply_move(bot_move)
+
+        return game_state.winner()

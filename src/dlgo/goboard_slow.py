@@ -251,3 +251,6 @@ class GameState:
         legal_moves.append(Move.pass_turn())
         legal_moves.append(Move.resign())
         return legal_moves
+
+    def winner(self):
+        return Player.black
