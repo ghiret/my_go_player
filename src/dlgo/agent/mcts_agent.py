@@ -43,7 +43,7 @@ class MCTSAgent(base.Agent):
 
             # Traverse the tree until a leaf is found
             while (not node.can_add_child()) and (not node.is_terminal()):
-                node = self.select_child(node)
+                node = self.select_child(node.children, node.game_state.next_player, self.temperature)
 
             # After a leaf has been found, add a new node.
             if node.can_add_child():
@@ -57,15 +57,15 @@ class MCTSAgent(base.Agent):
 
         return self.pick_best_move(root.children, game_state.next_player)
 
-    def select_child(self, node: MCTSNode):
-        total_rollouts = sum(child.num_rollouts for child in node.children)
+    def select_child(self, children: List[MCTSNode], next_player: Player, temperature: float):
+        total_rollouts = sum(child.num_rollouts for child in children)
 
         best_score = -1
 
         best_child = None
 
-        for child in node.children:
-            score = uct_score(total_rollouts, child.num_rollouts, child.winning_frac(node.game_state.next_player), self.temperature)
+        for child in children:
+            score = uct_score(total_rollouts, child.num_rollouts, child.winning_frac(next_player), temperature)
             if score > best_score:
                 best_score = score
                 best_child = child

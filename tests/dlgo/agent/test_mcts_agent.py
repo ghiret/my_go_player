@@ -1,10 +1,11 @@
 import math
 from typing import List, Optional
+from unittest.mock import Mock, patch
 
 import pytest
 
 from dlgo.agent.mcts_agent import MCTSAgent, uct_score
-from dlgo.goboard_slow import Move
+from dlgo.goboard_slow import GameState, Move
 from dlgo.gotypes import Player, Point
 
 
@@ -72,17 +73,24 @@ def test_uct_score_error_negative_temperature():
 
 
 class MockMCTSNode:
-    def __init__(self, winning_frac: float, move: Optional[Move] = None):
-        self.winning_frac_value = winning_frac
+    def __init__(self, num_rollouts=100, winning_frac=0.5, move=None):
+        self.num_rollouts = num_rollouts
+        self._winning_frac = winning_frac
         self.move = move
 
-    def winning_frac(self, player: Player) -> float:
-        return self.winning_frac_value
+    def winning_frac(self, player):
+        return self._winning_frac
+
+    def set_num_rollouts(self, num):
+        self.num_rollouts = num
+
+    def set_winning_frac(self, frac):
+        self._winning_frac = frac
 
 
 def test_pick_best_move_single_child():
     agent = MCTSAgent(num_rounds=10, temperature=0.8)
-    children = [MockMCTSNode(0.7, Move.play(Point(1, 1)))]
+    children = [MockMCTSNode(move=Move.play(Point(1, 1)), winning_frac=0.7)]
     best_move = agent.pick_best_move(children, Player.black)
     assert best_move == Move.play(Point(1, 1))
 
@@ -90,9 +98,9 @@ def test_pick_best_move_single_child():
 def test_pick_best_move_multiple_children():
     agent = MCTSAgent(num_rounds=10, temperature=0.8)
     children = [
-        MockMCTSNode(0.3, Move.play(Point(1, 1))),
-        MockMCTSNode(0.5, Move.play(Point(2, 2))),
-        MockMCTSNode(0.7, Move.play(Point(3, 3))),
+        MockMCTSNode(move=Move.play(Point(1, 1)), winning_frac=0.3),
+        MockMCTSNode(move=Move.play(Point(2, 2)), winning_frac=0.5),
+        MockMCTSNode(move=Move.play(Point(3, 3)), winning_frac=0.7),
     ]
     best_move = agent.pick_best_move(children, Player.black)
     assert best_move == Move.play(Point(3, 3))
@@ -101,8 +109,8 @@ def test_pick_best_move_multiple_children():
 def test_pick_best_move_tie():
     agent = MCTSAgent(num_rounds=10, temperature=0.8)
     children = [
-        MockMCTSNode(0.5, Move.play(Point(1, 1))),
-        MockMCTSNode(0.5, Move.play(Point(2, 2))),
+        MockMCTSNode(move=Move.play(Point(1, 1)), winning_frac=0.5),
+        MockMCTSNode(move=Move.play(Point(2, 2)), winning_frac=0.5),
     ]
     best_move = agent.pick_best_move(children, Player.black)
     assert best_move in [Move.play(Point(1, 1)), Move.play(Point(2, 2))]
@@ -117,9 +125,9 @@ def test_pick_best_move_no_children():
 def test_pick_best_move_negative_fractions():
     agent = MCTSAgent(num_rounds=10, temperature=0.8)
     children = [
-        MockMCTSNode(-0.1, Move.play(Point(1, 1))),
-        MockMCTSNode(-0.2, Move.play(Point(2, 2))),
-        MockMCTSNode(-0.05, Move.play(Point(3, 3))),
+        MockMCTSNode(move=Move.play(Point(1, 1)), winning_frac=-0.1),
+        MockMCTSNode(move=Move.play(Point(2, 2)), winning_frac=-0.2),
+        MockMCTSNode(move=Move.play(Point(3, 3)), winning_frac=-0.05),
     ]
     best_move = agent.pick_best_move(children, Player.black)
     assert best_move == Move.play(Point(3, 3))
@@ -128,9 +136,9 @@ def test_pick_best_move_negative_fractions():
 def test_pick_best_move_all_zero():
     agent = MCTSAgent(num_rounds=10, temperature=0.8)
     children = [
-        MockMCTSNode(0, Move.play(Point(1, 1))),
-        MockMCTSNode(0, Move.play(Point(2, 2))),
-        MockMCTSNode(0, Move.play(Point(3, 3))),
+        MockMCTSNode(move=Move.play(Point(1, 1)), winning_frac=0),
+        MockMCTSNode(move=Move.play(Point(2, 2)), winning_frac=0),
+        MockMCTSNode(move=Move.play(Point(3, 3)), winning_frac=0),
     ]
     best_move = agent.pick_best_move(children, Player.black)
     assert best_move in [Move.play(Point(1, 1)), Move.play(Point(2, 2)), Move.play(Point(3, 3))]
@@ -139,10 +147,69 @@ def test_pick_best_move_all_zero():
 def test_pick_best_move_different_players():
     agent = MCTSAgent(num_rounds=10, temperature=0.8)
     children = [
-        MockMCTSNode(0.3, Move.play(Point(1, 1))),
-        MockMCTSNode(0.5, Move.play(Point(2, 2))),
-        MockMCTSNode(0.7, Move.play(Point(3, 3))),
+        MockMCTSNode(move=Move.play(Point(1, 1)), winning_frac=0.3),
+        MockMCTSNode(move=Move.play(Point(2, 2)), winning_frac=0.5),
+        MockMCTSNode(move=Move.play(Point(3, 3)), winning_frac=0.7),
     ]
     best_move_black = agent.pick_best_move(children, Player.black)
     best_move_white = agent.pick_best_move(children, Player.white)
     assert best_move_black == best_move_white == Move.play(Point(3, 3))
+
+
+def test_select_child_single_child():
+    agent = MCTSAgent(num_rounds=10, temperature=1.0)
+    child = MockMCTSNode(num_rollouts=50, winning_frac=0.6)
+    children = [child]
+
+    with patch("dlgo.agent.mcts_agent.uct_score", return_value=0.8):
+        selected = agent.select_child(children, Player.black, 1.0)
+
+    assert selected == child
+
+
+def test_select_child_multiple_children():
+    agent = MCTSAgent(num_rounds=10, temperature=1.0)
+    child1 = MockMCTSNode(num_rollouts=30, winning_frac=0.4)
+    child2 = MockMCTSNode(num_rollouts=40, winning_frac=0.6)
+    child3 = MockMCTSNode(num_rollouts=30, winning_frac=0.5)
+    children = [child1, child2, child3]
+
+    uct_scores = [0.7, 0.9, 0.8]
+    with patch("dlgo.agent.mcts_agent.uct_score", side_effect=uct_scores):
+        selected = agent.select_child(children, Player.black, 1.0)
+
+    assert selected == child2
+
+
+def test_select_child_no_children():
+    agent = MCTSAgent(num_rounds=10, temperature=1.0)
+    children = []
+
+    selected = agent.select_child(children, Player.black, 1.0)
+
+    assert selected is None
+
+
+def test_select_child_equal_scores():
+    agent = MCTSAgent(num_rounds=10, temperature=1.0)
+    child1 = MockMCTSNode(num_rollouts=50, winning_frac=0.5)
+    child2 = MockMCTSNode(num_rollouts=50, winning_frac=0.5)
+    children = [child1, child2]
+
+    with patch("dlgo.agent.mcts_agent.uct_score", return_value=0.8):
+        selected = agent.select_child(children, Player.black, 1.0)
+
+    assert selected in [child1, child2]
+
+
+def test_select_child_different_rollouts():
+    agent = MCTSAgent(num_rounds=10, temperature=1.0)
+    child1 = MockMCTSNode(num_rollouts=10, winning_frac=0.6)
+    child2 = MockMCTSNode(num_rollouts=90, winning_frac=0.5)
+    children = [child1, child2]
+
+    uct_scores = [0.9, 0.8]
+    with patch("dlgo.agent.mcts_agent.uct_score", side_effect=uct_scores):
+        selected = agent.select_child(children, Player.black, 1.0)
+
+    assert selected == child1
