@@ -7,6 +7,7 @@ import pytest
 from dlgo.agent.mcts_agent import MCTSAgent, uct_score
 from dlgo.goboard_slow import GameState, Move
 from dlgo.gotypes import Player, Point
+from misc.board_utils import create_board_from_ascii
 
 
 def test_uct_score_typical_case():
@@ -213,3 +214,23 @@ def test_select_child_different_rollouts():
         selected = agent.select_child(children, Player.black, 1.0)
 
     assert selected == child1
+
+
+def test_select_move_empty_board():
+    ascii_board = """
+      A B C
+    1 . . .
+    2 . . .
+    3 . . .
+    """
+    board = create_board_from_ascii(ascii_board)
+    game_state = GameState(board, Player.black, None, None)
+    agent = MCTSAgent(num_rounds=10, temperature=1.0)
+
+    with patch.object(MCTSAgent, "select_child", return_value=Mock()), patch.object(
+        MCTSAgent, "simulate_random_game", return_value=Player.black
+    ), patch.object(MCTSAgent, "pick_best_move", return_value=Move.play(Point(2, 2))):
+
+        selected_move = agent.select_move(game_state)
+
+    assert selected_move == Move.play(Point(2, 2))
