@@ -3,7 +3,6 @@ from typing import List
 
 from dlgo.agent import base
 from dlgo.agent.mcts_node import MCTSNode
-
 from dlgo.agent.random_bot import RandomBot
 from dlgo.goboard_slow import GameState
 from dlgo.gotypes import Player
@@ -59,7 +58,6 @@ class MCTSAgent(base.Agent):
 
         return self.pick_best_move(root.children, game_state.next_player)
 
-
     def select_child(self, children: List[MCTSNode], next_player: Player, temperature: float):
         total_rollouts = sum(child.num_rollouts for child in children)
 
@@ -78,10 +76,10 @@ class MCTSAgent(base.Agent):
 
         bots = {Player.black: RandomBot(), Player.white: RandomBot()}
 
-        while not game.is_over():
+        while not game_state.is_over():
 
-            bot_move = bots[game.next_player].select_move(game)
+            bot_move = bots[game_state.next_player].select_move(game_state)
 
-            game = game.apply_move(bot_move)
+            game_state = game_state.apply_move(bot_move)
 
-        return game.winner()
+        return game_state.winner()
