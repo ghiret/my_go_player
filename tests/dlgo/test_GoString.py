@@ -1,3 +1,12 @@
+"""
+This file was initially generated using an AI language model (Claude 3.5 Sonnet),
+as part of an educational project based on the book "Deep Learning and the Game of Go"
+by Max Pumperla and Kevin Ferguson (Manning Publications, 2019).
+
+The generated code has been reviewed, potentially modified, and adapted to fit the
+project's requirements and to ensure correctness and adherence to the book's concepts.
+"""
+
 import pytest
 
 from dlgo.goboard_slow import GoString

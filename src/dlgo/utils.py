@@ -1,5 +1,11 @@
 # Copied from https://github.com/maxpumperla/deep_learning_and_the_game_of_go/blob/master/code/dlgo/utils.py
-# tag::print_utils[]
+"""
+This file is based on code from the book "Deep Learning and the Game of Go"
+by Max Pumperla and Kevin Ferguson (Manning Publications, 2019).
+Original code repository: https://github.com/maxpumperla/deep_learning_and_the_game_of_go
+
+The code may have been modified and adapted for educational purposes.
+"""
 from dlgo import gotypes
 
 COLS = "ABCDEFGHJKLMNOPQRST"
