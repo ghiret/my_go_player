@@ -13,6 +13,7 @@ from typing import FrozenSet, List, Optional, Tuple
 
 import dlgo.zobrist as zobrist
 from dlgo.gotypes import Player, Point
+from dlgo.scoring import compute_game_result
 
 
 class Move:
@@ -261,4 +262,9 @@ class GameState:
         return legal_moves
 
     def winner(self):
-        return Player.black
+        if not self.is_over():
+            return None
+        if self.last_move.is_resign:
+            return self.next_player
+        game_result = compute_game_result(self)
+        return game_result.winner
