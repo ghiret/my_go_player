@@ -30,7 +30,7 @@ def test_new_game_initialization(new_game):
 def test_apply_move_play(new_game):
     move = Move.play(Point(3, 3))
     next_state = new_game.apply_move(move)
-    assert next_state.board.get(Point(3, 3)) == Player.black
+    assert next_state.board.get_go_string_color(Point(3, 3)) == Player.black
     assert next_state.next_player == Player.white
     assert next_state.previous_state == new_game
     assert next_state.last_move == move
@@ -159,13 +159,13 @@ def test_snapback_not_ko():
 
     # Add these debug prints
     if debug:
-        print("Stone at (7, 4):", state3.board.get(Point(7, 4)))
-        print("Stone at (6, 4):", state3.board.get(Point(6, 4)))
-        print("Stone at (6, 5):", state3.board.get(Point(6, 5)))
+        print("Stone at (7, 4):", state3.board.get_go_string_color(Point(7, 4)))
+        print("Stone at (6, 4):", state3.board.get_go_string_color(Point(6, 4)))
+        print("Stone at (6, 5):", state3.board.get_go_string_color(Point(6, 5)))
 
-    assert state3.board.get(Point(7, 4)) is Player.white, "White stone should still be at (7,4)"
-    assert state3.board.get(Point(6, 4)) is None, "This should still be empty"
-    assert state3.board.get(Point(6, 5)) == Player.black, "Black's move should be at (6,5)"
+    assert state3.board.get_go_string_color(Point(7, 4)) is Player.white, "White stone should still be at (7,4)"
+    assert state3.board.get_go_string_color(Point(6, 4)) is None, "This should still be empty"
+    assert state3.board.get_go_string_color(Point(6, 5)) == Player.black, "Black's move should be at (6,5)"
 
     assert not state2.does_move_violate_ko(Player.black, move3), "Snapback should not violate ko rule"
 
@@ -221,8 +221,8 @@ def test_ko_violation():
 
     debug_output(debug, state1, "After Black captures at (3, 4)", output_dir, visualizer, 1)
 
-    assert state1.board.get(Point(3, 3)) is None, "White stone should be captured"
-    assert state1.board.get(Point(3, 4)) == Player.black, "Black stone should be at (3,4)"
+    assert state1.board.get_go_string_color(Point(3, 3)) is None, "White stone should be captured"
+    assert state1.board.get_go_string_color(Point(3, 4)) == Player.black, "Black stone should be at (3,4)"
 
     # White attempts to recapture
     move2 = Move.play(Point(3, 3))
@@ -252,8 +252,8 @@ def test_ko_violation():
     state5 = state3.apply_move(move5)
     debug_output(debug, state5, "After White recaptures at (3, 2)", output_dir, visualizer, 5)
 
-    assert state5.board.get(Point(3, 3)) == Player.white, "White stone should now be at (3,2)"
-    assert state5.board.get(Point(3, 4)) is None, "Black stone should be captured"
+    assert state5.board.get_go_string_color(Point(3, 3)) == Player.white, "White stone should now be at (3,2)"
+    assert state5.board.get_go_string_color(Point(3, 4)) is None, "Black stone should be captured"
 
     if debug:
         print("\nTest completed. Check the 'ko_test_images' directory for visual output.")

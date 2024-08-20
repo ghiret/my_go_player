@@ -12,7 +12,8 @@ from unittest.mock import Mock, patch
 import pytest
 
 from dlgo.gotypes import Player, Point
-from dlgo.scoring import GameResult, Territory, compute_game_result
+from dlgo.scoring import GameResult, Territory, _collect_region, compute_game_result
+from misc.board_utils import create_board_from_ascii
 
 
 def test_empty_territory():
@@ -222,3 +223,124 @@ def test_compute_game_result_calls_evaluate_territory():
         compute_game_result(mock_game_state)
 
     mock_evaluate.assert_called_once_with(mock_game_state.board)
+
+
+def test_collect_single_stone():
+    board = create_board_from_ascii(
+        """
+      A B C
+    1 . . .
+    2 . B .
+    3 . . .
+    """
+    )
+    points, borders = _collect_region(Point(2, 2), board)
+    assert points == [Point(2, 2)]
+    assert borders == {None, None, None, None}
+
+
+def test_collect_multiple_stones():
+    board = create_board_from_ascii(
+        """
+      A B C D
+    1 . . . .
+    2 . B B .
+    3 . B B .
+    4 . . . .
+    """
+    )
+    points, borders = _collect_region(Point(2, 2), board)
+    assert set(points) == {Point(2, 2), Point(2, 3), Point(3, 2), Point(3, 3)}
+
+    assert borders == {None}
+
+
+def test_collect_with_borders():
+    board = create_board_from_ascii(
+        """
+      A B C D
+    1 . W . .
+    2 W B B .
+    3 . B B .
+    4 . . W .
+    """
+    )
+    points, borders = _collect_region(Point(2, 2), board)
+    assert set(points) == {Point(2, 2), Point(2, 3), Point(3, 2), Point(3, 3)}
+    assert borders == {Player.white, None}
+
+
+def test_collect_at_edge():
+    board = create_board_from_ascii(
+        """
+      A B C
+    1 B B .
+    2 B B .
+    3 . . .
+    """
+    )
+    points, borders = _collect_region(Point(1, 1), board)
+    assert set(points) == {Point(1, 1), Point(1, 2), Point(2, 1), Point(2, 2)}
+    assert borders == {None}
+
+
+def test_collect_surrounded():
+    board = create_board_from_ascii(
+        """
+      A B C
+    1 . W .
+    2 W B W
+    3 . W .
+    """
+    )
+    points, borders = _collect_region(Point(2, 2), board)
+    assert points == [Point(2, 2)]
+    assert borders == {Player.white}
+
+
+def test_collect_large_region():
+    board = create_board_from_ascii(
+        """
+      A B C D E
+    1 B . . . .
+    2 B B . . .
+    3 B B B . .
+    4 B B B B .
+    5 B B B B B
+    """
+    )
+    points, borders = _collect_region(Point(1, 1), board)
+    assert len(points) == 15  # Sum of 1 to 5
+    assert None in borders  # Edge of the board
+    assert Player.black not in borders
+
+
+def test_revisit_point():
+    board = create_board_from_ascii(
+        """
+      A B C
+    1 B B .
+    2 B B .
+    3 . . .
+    """
+    )
+    visited = {Point(1, 1): True}
+    points, borders = _collect_region(Point(2, 2), board, visited)
+    assert set(points) == {Point(2, 2), Point(1, 2), Point(2, 1)}
+    assert borders == {None}
+    assert Point(1, 1) not in points
+
+
+def test_collect_empty_region():
+    board = create_board_from_ascii(
+        """
+      A B C
+    1 . . .
+    2 . . .
+    3 . . .
+    """
+    )
+    points, borders = _collect_region(Point(2, 2), board)
+
+    assert len(points) == 9
+    assert borders == set()

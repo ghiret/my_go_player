@@ -56,16 +56,14 @@ class GameResult(namedtuple("GameResult", "b w komi")):
         return "W+%.1f" % (w - self.b,)
 
 
-""" evaluate_territory:
-Map a board into territory and dame.
-
-Any points that are completely surrounded by a single color are
-counted as territory; it makes no attempt to identify even
-trivially dead groups.
-"""
-
-
 def evaluate_territory(board):
+    """evaluate_territory:
+    Map a board into territory and dame.
+
+    Any points that are completely surrounded by a single color are
+    counted as territory; it makes no attempt to identify even
+    trivially dead groups.
+    """
 
     status = {}
     for r in range(1, board.num_rows + 1):
@@ -74,10 +72,10 @@ def evaluate_territory(board):
             # Skip the point, if you already visited this as part of a different group.
             if p in status:
                 continue
-            stone = board.get(p)
+            stone = board.get_go_string_color(p)
             # If the point is a stone, add it as status.
             if stone is not None:
-                status[p] = board.get(p)
+                status[p] = board.get_go_string_color(p)
             else:
                 group, neighbors = _collect_region(p, board)
                 # If a point is completely surrounded by black or white stones, count it as territory.
@@ -93,14 +91,12 @@ def evaluate_territory(board):
     return Territory(status)
 
 
-""" _collect_region:
+def _collect_region(start_pos: Point, board, visited=None):
+    """_collect_region:
 
-Find the contiguous section of a board containing a point. Also
-identify all the boundary points.
-"""
-
-
-def _collect_region(start_pos, board, visited=None):
+    Find the contiguous section of a board containing a point. Also
+    identify all the boundary points.
+    """
 
     if visited is None:
         visited = {}
@@ -109,13 +105,16 @@ def _collect_region(start_pos, board, visited=None):
     all_points = [start_pos]
     all_borders = set()
     visited[start_pos] = True
-    here = board.get(start_pos)
+    # This returns the color of the piece or None if no piece is placed here.
+    here = board.get_go_string_color(start_pos)
+
     deltas = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     for delta_r, delta_c in deltas:
         next_p = Point(row=start_pos.row + delta_r, col=start_pos.col + delta_c)
         if not board.is_on_grid(next_p):
             continue
-        neighbor = board.get(next_p)
+        neighbor = board.get_go_string_color(next_p)
+        # Check if the neighbor is the same color as the starting position
         if neighbor == here:
             points, borders = _collect_region(next_p, board, visited)
             all_points += points

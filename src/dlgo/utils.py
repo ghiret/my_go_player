@@ -31,7 +31,7 @@ def print_board(board):
         bump = " " if row <= 9 else ""
         line = []
         for col in range(1, board.num_cols + 1):
-            stone = board.get(gotypes.Point(row=row, col=col))
+            stone = board.get_go_string_color(gotypes.Point(row=row, col=col))
             line.append(STONE_TO_CHAR[stone])
         print("%s%d %s" % (bump, row, "".join(line)))
     print("    " + "  ".join(COLS[: board.num_cols]))

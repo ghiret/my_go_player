@@ -154,7 +154,7 @@ class Board:
     def is_on_grid(self, point):
         return 1 <= point.row <= self.num_rows and 1 <= point.col <= self.num_cols
 
-    def get(self, point):
+    def get_go_string_color(self, point):
         string = self._grid.get(point)
         if string is None:
             return None
@@ -243,7 +243,7 @@ class GameState:
             return True
 
         return (
-            self.board.get(move.point) is None
+            self.board.get_go_string_color(move.point) is None
             and not self.does_move_violate_ko(self.next_player, move)
             and not self.is_move_self_capture(self.next_player, move)
         )
