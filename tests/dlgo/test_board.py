@@ -241,3 +241,45 @@ def test_board_equality_after_capture():
 
     # They should be equal after capture
     assert board1 == board2, "Boards should be equal after the same capture occurs"
+
+
+def test_capture_in_bottom_right_corner():
+
+    board = create_board_from_ascii(
+        """
+        A B
+      1 . W
+      2 . B
+    """
+    )
+    board.place_stone(Player.white, Point(2, 1))
+    board_after_capture = create_board_from_ascii(
+        """
+        A B
+      1 . W
+      2 W .
+    """
+    )
+
+    assert board == board_after_capture, "Boards should be equal after the same capture occurs"
+
+
+def test_fail_to_self_capture_in_bottom_right_corner():
+
+    board = create_board_from_ascii(
+        """
+        A B
+      1 . W
+      2 W .
+    """
+    )
+    board.place_stone(Player.black, Point(2, 2))
+
+    board_after_capture = create_board_from_ascii(
+        """
+        A B
+      1 . W
+      2 W B
+    """
+    )
+    assert board == board_after_capture, "Boards should be equal after the same capture occurs"

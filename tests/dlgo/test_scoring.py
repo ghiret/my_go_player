@@ -12,7 +12,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from dlgo.gotypes import Player, Point
-from dlgo.scoring import GameResult, Territory, _collect_region, compute_game_result
+from dlgo.scoring import GameResult, Territory, _collect_region, compute_game_result, evaluate_territory
 from misc.board_utils import create_board_from_ascii
 
 
@@ -344,3 +344,155 @@ def test_collect_empty_region():
 
     assert len(points) == 9
     assert borders == set()
+
+
+def test_empty_board():
+    board = create_board_from_ascii(
+        """
+        A B C
+      1 . . .
+      2 . . .
+      3 . . .
+    """
+    )
+    territory = evaluate_territory(board)
+    assert territory.num_black_territory == 0
+    assert territory.num_white_territory == 0
+    assert territory.num_black_stones == 0
+    assert territory.num_white_stones == 0
+    assert territory.num_dame == 9
+
+
+def test_simple_territories():
+    # Black will be captured because it is in an edge
+    # So white controls everything
+    board = create_board_from_ascii(
+        """
+        A B C D
+      1 B W . .
+      2 B W . .
+      3 B W . .
+      4 B W . .
+    """
+    )
+    territory = evaluate_territory(board)
+    assert territory.num_black_territory == 0
+    assert territory.num_white_territory == 12
+    assert territory.num_black_stones == 0
+    assert territory.num_white_stones == 4
+    assert territory.num_dame == 0
+
+
+def test_complex_territories():
+    # Here, black keeps one liberty, so it keeps its territory
+    board = create_board_from_ascii(
+        """
+        A B C D E
+      1 B B B W .
+      2 B . B W .
+      3 B B B W .
+      4 W W W W .
+      5 . . . . .
+    """
+    )
+    territory = evaluate_territory(board)
+    assert territory.num_black_territory == 1
+    assert territory.num_white_territory == 9
+    assert territory.num_black_stones == 8
+    assert territory.num_white_stones == 7
+    assert territory.num_dame == 0
+
+
+def test_dame_points():
+    board = create_board_from_ascii(
+        """
+        A B C D
+      1 B W . B
+      2 W . . W
+      3 . . . .
+      4 B W . B
+    """
+    )
+    territory = evaluate_territory(board)
+    assert territory.num_black_territory == 0
+    assert territory.num_white_territory == 1
+    assert territory.num_black_stones == 3
+    assert territory.num_white_stones == 4
+    assert territory.num_dame == 8
+
+
+def test_enclosed_territory():
+    # Here, because white is in the middle, black has no territory
+    board = create_board_from_ascii(
+        """
+        A B C D E
+      1 B B B B B
+      2 B . . . B
+      3 B . W . B
+      4 B . . . B
+      5 B B B B B
+    """
+    )
+    territory = evaluate_territory(board)
+    assert territory.num_black_territory == 0
+    assert territory.num_white_territory == 0
+    assert territory.num_black_stones == 16
+    assert territory.num_white_stones == 1
+    assert territory.num_dame == 8
+
+
+def test_mixed_board():
+
+    board = create_board_from_ascii(
+        """
+        A B C D E
+      1 B W . W B
+      2 W . . . W
+      3 . . B . .
+      4 W . . . W
+      5 B W . W .
+    """
+    )
+
+    territory = evaluate_territory(board)
+    assert territory.num_black_territory == 0
+    assert territory.num_white_territory == 4
+    assert territory.num_black_stones == 1
+    assert territory.num_white_stones == 8
+    assert territory.num_dame == 12
+
+
+def test_corner_territory():
+    board = create_board_from_ascii(
+        """
+        A B C
+      1 B B B
+      2 B . .
+      3 B . .
+    """
+    )
+    territory = evaluate_territory(board)
+    assert territory.num_black_territory == 4
+    assert territory.num_white_territory == 0
+    assert territory.num_black_stones == 5
+    assert territory.num_white_stones == 0
+    assert territory.num_dame == 0
+
+
+def test_multiple_enclosed_territories():
+    board = create_board_from_ascii(
+        """
+        A B C D E
+      1 B B W W W
+      2 B . B W .
+      3 B B W W W
+      4 W W B B B
+      5 W . W B .
+    """
+    )
+    territory = evaluate_territory(board)
+    assert territory.num_black_territory == 2
+    assert territory.num_white_territory == 2
+    assert territory.num_black_stones == 10
+    assert territory.num_white_stones == 11
+    assert territory.num_dame == 0

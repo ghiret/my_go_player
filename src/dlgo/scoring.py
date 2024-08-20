@@ -75,7 +75,7 @@ def evaluate_territory(board):
             stone = board.get_go_string_color(p)
             # If the point is a stone, add it as status.
             if stone is not None:
-                status[p] = board.get_go_string_color(p)
+                status[p] = stone
             else:
                 group, neighbors = _collect_region(p, board)
                 # If a point is completely surrounded by black or white stones, count it as territory.

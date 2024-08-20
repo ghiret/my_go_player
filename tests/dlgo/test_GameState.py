@@ -111,6 +111,21 @@ def test_is_move_self_capture():
     assert not game.is_move_self_capture(Player.black, move_pass)
 
 
+def test_is_move_self_capture_in_corner():
+
+    board = create_board_from_ascii(
+        """
+        A B
+      1 . W
+      2 W .
+    """
+    )
+
+    game = GameState(board, Player.black, None, None)
+    move = Move.play(Point(2, 2))
+    assert game.is_move_self_capture(Player.black, move)
+
+
 def test_situation():
     board = Board(5, 5)
     game = GameState(board, Player.black, None, None)

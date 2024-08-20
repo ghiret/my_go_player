@@ -96,6 +96,11 @@ class Board:
         return self._hash
 
     def place_stone(self, player, point):
+        """
+        This function allows for self capture and it fails to recognise it.
+        During normal game this will not be a problem because this will not be
+        directly called, and GameState.apply_move checks for self-capture to reject the move
+        """
         assert self.is_on_grid(point)
         assert self._grid.get(point) is None
 
@@ -125,7 +130,8 @@ class Board:
             new_string = new_string.merged_with(same_color_string)
         for new_string_point in new_string.stones:
             self._grid[new_string_point] = new_string
-
+        # Remove the None point and add the player color
+        self._hash ^= zobrist.HASH_CODE[point, None]
         self._hash ^= zobrist.HASH_CODE[point, player]
 
         for other_color_string in adjacent_opposite_color:
@@ -148,8 +154,9 @@ class Board:
                 if neighbor_string is not string:
                     self._replace_string(neighbor_string.with_liberty(point))
             self._grid.pop(point)
-
+            # Remove the empty point and add the None point.
             self._hash ^= zobrist.HASH_CODE[point, string.color]
+            self._hash ^= zobrist.HASH_CODE[point, None]
 
     def is_on_grid(self, point):
         return 1 <= point.row <= self.num_rows and 1 <= point.col <= self.num_cols
