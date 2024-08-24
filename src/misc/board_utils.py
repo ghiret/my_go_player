@@ -56,9 +56,9 @@ def print_board(board):
         line = f"{row} "
         for col in range(1, board_size + 1):
             point = Point(row, col)
-            if board.get(point) == Player.black:
+            if board.get_go_string_color(point) == Player.black:
                 line += "B "
-            elif board.get(point) == Player.white:
+            elif board.get_go_string_color(point) == Player.white:
                 line += "W "
             else:
                 line += ". "

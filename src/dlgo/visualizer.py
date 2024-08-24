@@ -62,7 +62,7 @@ class GameVisualizer:
             for row in range(num_rows):
                 for col in range(num_cols):
                     point = Point(row + 1, col + 1)
-                    player = game_state.board.get(point)
+                    player = game_state.board.get_go_string_color(point)
                     if player is not None:
                         self._draw_stone(draw, row, col, player)
 
@@ -87,7 +87,7 @@ class GameVisualizer:
         for row in range(num_rows):
             for col in range(num_cols):
                 point = Point(row + 1, col + 1)
-                player = game_state.board.get(point)
+                player = game_state.board.get_go_string_color(point)
                 if player is not None:
                     self._draw_stone(draw, row, col, player)
 

@@ -20,7 +20,7 @@ def test_create_empty_board():
     assert board.num_cols == 3
     for row in range(1, 4):
         for col in range(1, 4):
-            assert board.get(Point(row, col)) is None
+            assert board.get_go_string_color(Point(row, col)) is None
 
 
 def test_create_board_with_stones():
@@ -31,12 +31,12 @@ def test_create_board_with_stones():
     3 W . B
     """
     board = create_board_from_ascii(ascii_board)
-    assert board.get(Point(1, 1)) == Player.black
-    assert board.get(Point(1, 3)) == Player.white
-    assert board.get(Point(2, 2)) == Player.black
-    assert board.get(Point(3, 1)) == Player.white
-    assert board.get(Point(3, 3)) == Player.black
-    assert board.get(Point(2, 1)) is None
+    assert board.get_go_string_color(Point(1, 1)) == Player.black
+    assert board.get_go_string_color(Point(1, 3)) == Player.white
+    assert board.get_go_string_color(Point(2, 2)) == Player.black
+    assert board.get_go_string_color(Point(3, 1)) == Player.white
+    assert board.get_go_string_color(Point(3, 3)) == Player.black
+    assert board.get_go_string_color(Point(2, 1)) is None
 
 
 def test_create_larger_board():
@@ -52,8 +52,8 @@ def test_create_larger_board():
     assert board.num_rows == 5
     assert board.num_cols == 5
     for row in range(2, 5):
-        assert board.get(Point(row, 2)) == Player.black
-        assert board.get(Point(row, 3)) == Player.white
+        assert board.get_go_string_color(Point(row, 2)) == Player.black
+        assert board.get_go_string_color(Point(row, 3)) == Player.white
 
 
 def test_create_board_with_extra_whitespace():
@@ -66,8 +66,8 @@ def test_create_board_with_extra_whitespace():
     board = create_board_from_ascii(ascii_board)
     assert board.num_rows == 3
     assert board.num_cols == 3
-    assert board.get(Point(2, 1)) == Player.black
-    assert board.get(Point(2, 3)) == Player.white
+    assert board.get_go_string_color(Point(2, 1)) == Player.black
+    assert board.get_go_string_color(Point(2, 3)) == Player.white
 
 
 def test_create_board_without_column_numbers():
@@ -79,8 +79,8 @@ def test_create_board_without_column_numbers():
     board = create_board_from_ascii(ascii_board)
     assert board.num_rows == 3
     assert board.num_cols == 3
-    assert board.get(Point(2, 1)) == Player.black
-    assert board.get(Point(2, 3)) == Player.white
+    assert board.get_go_string_color(Point(2, 1)) == Player.black
+    assert board.get_go_string_color(Point(2, 3)) == Player.white
 
 
 def test_create_board_with_invalid_characters():

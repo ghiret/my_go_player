@@ -45,7 +45,7 @@ def test_is_on_grid():
 def test_place_stone(empty_board):
     point = Point(3, 3)
     empty_board.place_stone(Player.black, point)
-    assert empty_board.get(point) == Player.black
+    assert empty_board.get_go_string_color(point) == Player.black
 
 
 def test_place_stone_occupied(empty_board):
@@ -67,13 +67,13 @@ def test_capture_stone():
     """
 
     board = create_board_from_ascii(ascii_board)
-    assert board.get(Point(2, 2)) is None
+    assert board.get_go_string_color(Point(2, 2)) is None
 
     # White pieces should still be there
-    assert board.get(Point(1, 2)) == Player.white
-    assert board.get(Point(2, 3)) == Player.white
-    assert board.get(Point(2, 1)) == Player.white
-    assert board.get(Point(3, 2)) == Player.white
+    assert board.get_go_string_color(Point(1, 2)) == Player.white
+    assert board.get_go_string_color(Point(2, 3)) == Player.white
+    assert board.get_go_string_color(Point(2, 1)) == Player.white
+    assert board.get_go_string_color(Point(3, 2)) == Player.white
 
 
 def test_capture_multiple_stones():
@@ -86,16 +86,16 @@ def test_capture_multiple_stones():
     5 . . . . .
     """
     board = create_board_from_ascii(ascii_board)
-    assert board.get(Point(2, 2)) is None
-    assert board.get(Point(2, 3)) is None
+    assert board.get_go_string_color(Point(2, 2)) is None
+    assert board.get_go_string_color(Point(2, 3)) is None
 
     # White pieces should still be there
-    assert board.get(Point(1, 2)) == Player.white
-    assert board.get(Point(1, 3)) == Player.white
-    assert board.get(Point(2, 1)) == Player.white
-    assert board.get(Point(2, 4)) == Player.white
-    assert board.get(Point(3, 2)) == Player.white
-    assert board.get(Point(3, 3)) == Player.white
+    assert board.get_go_string_color(Point(1, 2)) == Player.white
+    assert board.get_go_string_color(Point(1, 3)) == Player.white
+    assert board.get_go_string_color(Point(2, 1)) == Player.white
+    assert board.get_go_string_color(Point(2, 4)) == Player.white
+    assert board.get_go_string_color(Point(3, 2)) == Player.white
+    assert board.get_go_string_color(Point(3, 3)) == Player.white
 
 
 def test_get_go_string():
@@ -241,3 +241,45 @@ def test_board_equality_after_capture():
 
     # They should be equal after capture
     assert board1 == board2, "Boards should be equal after the same capture occurs"
+
+
+def test_capture_in_bottom_right_corner():
+
+    board = create_board_from_ascii(
+        """
+        A B
+      1 . W
+      2 . B
+    """
+    )
+    board.place_stone(Player.white, Point(2, 1))
+    board_after_capture = create_board_from_ascii(
+        """
+        A B
+      1 . W
+      2 W .
+    """
+    )
+
+    assert board == board_after_capture, "Boards should be equal after the same capture occurs"
+
+
+def test_fail_to_self_capture_in_bottom_right_corner():
+
+    board = create_board_from_ascii(
+        """
+        A B
+      1 . W
+      2 W .
+    """
+    )
+    board.place_stone(Player.black, Point(2, 2))
+
+    board_after_capture = create_board_from_ascii(
+        """
+        A B
+      1 . W
+      2 W B
+    """
+    )
+    assert board == board_after_capture, "Boards should be equal after the same capture occurs"

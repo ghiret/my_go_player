@@ -13,6 +13,7 @@ from typing import FrozenSet, List, Optional, Tuple
 
 import dlgo.zobrist as zobrist
 from dlgo.gotypes import Player, Point
+from dlgo.scoring import compute_game_result
 
 
 class Move:
@@ -95,6 +96,11 @@ class Board:
         return self._hash
 
     def place_stone(self, player, point):
+        """
+        This function allows for self capture and it fails to recognise it.
+        During normal game this will not be a problem because this will not be
+        directly called, and GameState.apply_move checks for self-capture to reject the move
+        """
         assert self.is_on_grid(point)
         assert self._grid.get(point) is None
 
@@ -124,7 +130,8 @@ class Board:
             new_string = new_string.merged_with(same_color_string)
         for new_string_point in new_string.stones:
             self._grid[new_string_point] = new_string
-
+        # Remove the None point and add the player color
+        self._hash ^= zobrist.HASH_CODE[point, None]
         self._hash ^= zobrist.HASH_CODE[point, player]
 
         for other_color_string in adjacent_opposite_color:
@@ -147,13 +154,14 @@ class Board:
                 if neighbor_string is not string:
                     self._replace_string(neighbor_string.with_liberty(point))
             self._grid.pop(point)
-
+            # Remove the empty point and add the None point.
             self._hash ^= zobrist.HASH_CODE[point, string.color]
+            self._hash ^= zobrist.HASH_CODE[point, None]
 
     def is_on_grid(self, point):
         return 1 <= point.row <= self.num_rows and 1 <= point.col <= self.num_cols
 
-    def get(self, point):
+    def get_go_string_color(self, point):
         string = self._grid.get(point)
         if string is None:
             return None
@@ -242,7 +250,7 @@ class GameState:
             return True
 
         return (
-            self.board.get(move.point) is None
+            self.board.get_go_string_color(move.point) is None
             and not self.does_move_violate_ko(self.next_player, move)
             and not self.is_move_self_capture(self.next_player, move)
         )
@@ -261,4 +269,9 @@ class GameState:
         return legal_moves
 
     def winner(self):
-        return Player.black
+        if not self.is_over():
+            return None
+        if self.last_move.is_resign:
+            return self.next_player
+        game_result = compute_game_result(self)
+        return game_result.winner
