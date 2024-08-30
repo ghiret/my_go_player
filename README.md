@@ -62,3 +62,9 @@ poetry run python src/scripts/random_bot_vs_random_bot.py
 ```bash
 poetry run python src/scripts/human_vs_random_bot.py
 ```
+
+### How to generate mcts data
+```bash
+ poetry python run src/scripts/generate_mcts_games.py -n 20 --board-out features.npy --m
+ove-out labels.npy
+```
