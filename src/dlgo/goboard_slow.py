@@ -212,19 +212,10 @@ class GameState:
         board = Board(*board_size)
         return GameState(board, Player.black, None, None)
 
-    def is_over(self):
-        if self.last_move is None:
-            return False
-        if self.last_move.is_resign:
-            return True
-
-        if (second_last_move := self.previous_state.last_move) is None:
-            return False
-        return self.last_move.is_pass and second_last_move.is_pass
-
     def is_move_self_capture(self, player: Player, move: Move):
         if not move.is_play:
             return False
+
         next_board = copy.deepcopy(self.board)
         next_board.place_stone(player, move.point)
         new_string = next_board.get_go_string(move.point)
@@ -254,6 +245,16 @@ class GameState:
             and not self.does_move_violate_ko(self.next_player, move)
             and not self.is_move_self_capture(self.next_player, move)
         )
+
+    def is_over(self):
+        if self.last_move is None:
+            return False
+        if self.last_move.is_resign:
+            return True
+
+        if (second_last_move := self.previous_state.last_move) is None:
+            return False
+        return self.last_move.is_pass and second_last_move.is_pass
 
     def legal_moves(self) -> List[Move]:
 

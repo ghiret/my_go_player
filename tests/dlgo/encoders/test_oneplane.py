@@ -11,7 +11,7 @@ import numpy as np
 import pytest
 from utils.test_board_utils import create_board_from_ascii
 
-from dlgo.encoders.base import Encoder
+from dlgo.encoders.base import get_encoder_by_name
 from dlgo.encoders.oneplane import OnePlaneEncoder
 from dlgo.goboard_slow import Board, GameState
 from dlgo.gotypes import Player, Point
@@ -143,17 +143,17 @@ def test_different_board_sizes():
 
 def test_get_encoder_by_name():
     # Test with integer board size
-    encoder = Encoder.get_encoder_by_name("oneplane", 19)
+    encoder = get_encoder_by_name("oneplane", 19)
     assert isinstance(encoder, OnePlaneEncoder)
     assert encoder.board_width == 19
     assert encoder.board_height == 19
 
     # Test with tuple board size
-    encoder = Encoder.get_encoder_by_name("oneplane", (13, 13))
+    encoder = get_encoder_by_name("oneplane", (13, 13))
     assert isinstance(encoder, OnePlaneEncoder)
     assert encoder.board_width == 13
     assert encoder.board_height == 13
 
     # Test with invalid encoder name
     with pytest.raises(ImportError):
-        Encoder.get_encoder_by_name("invalid_encoder", 19)
+        get_encoder_by_name("invalid_encoder", 19)
