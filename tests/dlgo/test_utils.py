@@ -10,8 +10,10 @@ project's requirements and to ensure correctness and adherence to the book's con
 from contextlib import redirect_stdout
 from io import StringIO
 
+import numpy as np
 import pytest
 
+from dlgo.goboard_fast import MoveAge
 from dlgo.goboard_slow import Board, Move
 from dlgo.gotypes import Player, Point
 from dlgo.utils import point_from_coords, print_board, print_move
@@ -88,3 +90,67 @@ def test_point_from_coords():
     assert point_from_coords("J10") == Point(row=10, col=9)
     assert point_from_coords("K11") == Point(row=11, col=10)
     assert point_from_coords("T19") == Point(row=19, col=19)
+
+
+@pytest.fixture
+def board():
+    return Board(19, 19)
+
+
+@pytest.fixture
+def move_age(board):
+    return MoveAge(board)
+
+
+def test_move_age_initialization(move_age):
+    """Test that MoveAge is initialized with all positions set to -1."""
+    assert np.all(move_age.move_ages == -1)
+    assert move_age.move_ages.shape == (19, 19)
+
+
+def test_get_method(move_age):
+    """Test the get method returns correct values."""
+    assert move_age.get(0, 0) == -1
+    assert move_age.get(18, 18) == -1
+
+
+def test_reset_age_method(move_age):
+    """Test the reset_age method sets the age of a point to -1."""
+    move_age.move_ages[5, 5] = 3
+    move_age.reset_age(Point(row=6, col=6))
+    assert move_age.get(5, 5) == -1
+
+
+def test_add_method(move_age):
+    """Test the add method sets the age of a point to 0."""
+    move_age.add(Point(row=1, col=1))
+    assert move_age.get(0, 0) == 0
+
+
+def test_increment_all_method(move_age):
+    """Test the increment_all method increases the age of all non-negative points."""
+    move_age.add(Point(row=1, col=1))
+    move_age.add(Point(row=2, col=2))
+    move_age.increment_all()
+    assert move_age.get(0, 0) == 1
+    assert move_age.get(1, 1) == 1
+    assert move_age.get(0, 1) == -1  # This point wasn't added, so it should still be -1
+
+
+def test_multiple_operations(move_age):
+    """Test a sequence of operations to ensure correct behavior."""
+    move_age.add(Point(row=1, col=1))
+    move_age.increment_all()
+    move_age.add(Point(row=2, col=2))
+    move_age.increment_all()
+    assert move_age.get(0, 0) == 2
+    assert move_age.get(1, 1) == 1
+    assert move_age.get(2, 2) == -1
+
+
+def test_reset_after_increment(move_age):
+    """Test resetting a point's age after incrementing."""
+    move_age.add(Point(row=1, col=1))
+    move_age.increment_all()
+    move_age.reset_age(Point(row=1, col=1))
+    assert move_age.get(0, 0) == -1
