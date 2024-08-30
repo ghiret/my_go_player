@@ -9,8 +9,8 @@ project's requirements and to ensure correctness and adherence to the book's con
 
 import pytest
 
-from dlgo.goboard_slow import Move
 from dlgo.gotypes import Point
+from dlgo.move import Move
 
 
 def test_move_play():

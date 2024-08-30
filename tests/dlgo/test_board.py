@@ -9,7 +9,8 @@ project's requirements and to ensure correctness and adherence to the book's con
 
 import pytest
 
-from dlgo.goboard_slow import Board, GoString
+from dlgo.goboard_slow import Board
+from dlgo.gostring import GoString
 from dlgo.gotypes import Player, Point
 from misc.board_utils import create_board_from_ascii
 

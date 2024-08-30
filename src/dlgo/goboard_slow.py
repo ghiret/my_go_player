@@ -12,77 +12,10 @@ import copy
 from typing import FrozenSet, List, Optional, Tuple
 
 import dlgo.zobrist as zobrist
+from dlgo.gostring import GoString
 from dlgo.gotypes import Player, Point
+from dlgo.move import Move
 from dlgo.scoring import compute_game_result
-
-
-class Move:
-    def __init__(self, point: Optional[Point] = None, is_pass: bool = False, is_resign: bool = False):
-        assert (point is not None) ^ is_pass ^ is_resign
-        self.point = point
-        self.is_play = self.point is not None
-        self.is_pass = is_pass
-        self.is_resign = is_resign
-
-    @classmethod
-    def play(cls, point: Point) -> Move:
-        return Move(point=point)
-
-    @classmethod
-    def pass_turn(cls) -> Move:
-        return Move(is_pass=True)
-
-    @classmethod
-    def resign(cls) -> Move:
-        return Move(is_resign=True)
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Move):
-            return NotImplemented
-        return (self.point, self.is_pass, self.is_resign) == (other.point, other.is_pass, other.is_resign)
-
-    def __hash__(self) -> int:
-        return hash((self.point, self.is_pass, self.is_resign))
-
-
-class GoString:
-    def __init__(self, color, stones, liberties):
-        self.color = color
-        self.stones = frozenset(stones)
-        self.liberties = frozenset(liberties)
-
-    def without_liberty(self, point: Point):
-        if point not in self.liberties:
-            raise ValueError(f"Point {point} is not a liberty of this string")
-        new_liberties = self.liberties - set([point])
-
-        return GoString(self.color, self.stones, new_liberties)
-
-    def with_liberty(self, point: Point):
-        new_liberties = self.liberties | set([point])
-        return GoString(self.color, self.stones, new_liberties)
-
-    def merged_with(self, go_string: GoString) -> GoString:
-        if self.color != go_string.color:
-            raise ValueError("Can only merge strings of the same color")
-        combined_stones = self.stones | go_string.stones
-        return GoString(
-            self.color,
-            set(combined_stones),
-            set((self.liberties | go_string.liberties) - combined_stones),
-        )
-
-    @property
-    def num_liberties(self) -> int:
-        return len(self.liberties)
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, GoString):
-            return NotImplemented
-        return self.color == other.color and self.stones == other.stones and self.liberties == other.liberties
-
-    def __hash__(self) -> int:
-        return hash((self.color, self.stones, self.liberties))
 
 
 class Board:
