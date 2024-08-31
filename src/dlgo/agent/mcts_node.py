@@ -10,8 +10,8 @@ import random
 from typing import TYPE_CHECKING, List, Optional
 
 from dlgo.gamestate import GameState
-from dlgo.move import Move
 from dlgo.gotypes import Player
+from dlgo.move import Move
 
 
 class MCTSNode(object):

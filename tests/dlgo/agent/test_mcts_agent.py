@@ -15,8 +15,8 @@ import pytest
 
 from dlgo.agent.mcts_agent import MCTSAgent, uct_score
 from dlgo.gamestate import GameState
-from dlgo.move import  Move
 from dlgo.gotypes import Player, Point
+from dlgo.move import Move
 from misc.board_utils import create_board_from_ascii
 
 

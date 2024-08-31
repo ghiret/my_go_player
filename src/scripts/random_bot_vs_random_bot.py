@@ -8,9 +8,8 @@ The code may have been modified and adapted for educational purposes.
 
 import time
 
-from dlgo import agent
+from dlgo import agent, gotypes, utils
 from dlgo.gamestate import GameState
-from dlgo import gotypes, utils
 
 
 def main():
