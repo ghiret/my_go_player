@@ -11,6 +11,7 @@ RUN apt-get update && \
     git \
     curl \
     zsh \
+    libhdf5-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m devuser && \
@@ -40,9 +41,16 @@ RUN pip install --upgrade pip && \
     poetry
 
 
+# Copy project files
+COPY --chown=devuser:devuser pyproject.toml poetry.lock /workspace/
+
+# Ensure Poetry is in the PATH
+ENV PATH="/home/devuser/.local/bin:$PATH"
+
 WORKDIR /workspace
 
 SHELL ["/bin/zsh", "-c"]
 
+RUN poetry install
 # Add /workspace as a safe directory for Git
 RUN git config --global --add safe.directory /workspace
