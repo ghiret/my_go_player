@@ -13,10 +13,10 @@ from io import StringIO
 import numpy as np
 import pytest
 
-from dlgo.goboard_fast import MoveAge
-from dlgo.goboard_slow import Board, Move
+from dlgo.board import Board
 from dlgo.gotypes import Player, Point
-from dlgo.utils import point_from_coords, print_board, print_move
+from dlgo.move import Move
+from dlgo.utils import MoveAge, point_from_coords, print_board, print_move
 
 
 def capture_print_output(func, *args, **kwargs):

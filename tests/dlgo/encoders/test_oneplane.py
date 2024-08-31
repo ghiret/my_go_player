@@ -11,9 +11,10 @@ import numpy as np
 import pytest
 from utils.test_board_utils import create_board_from_ascii
 
+from dlgo.board import Board
 from dlgo.encoders.base import get_encoder_by_name
 from dlgo.encoders.oneplane import OnePlaneEncoder
-from dlgo.goboard_slow import Board, GameState
+from dlgo.goboard_slow import GameState
 from dlgo.gotypes import Player, Point
 
 
