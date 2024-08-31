@@ -12,7 +12,7 @@ from typing import List
 from dlgo.agent import base
 from dlgo.agent.mcts_node import MCTSNode
 from dlgo.agent.random_bot import RandomBot
-from dlgo.goboard_slow import GameState
+from dlgo.gamestate import GameState
 from dlgo.gotypes import Player
 
 

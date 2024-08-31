@@ -8,7 +8,7 @@ The code may have been modified and adapted for educational purposes.
 
 import importlib
 
-from dlgo.goboard_slow import GameState
+from dlgo.gamestate import GameState
 from dlgo.gotypes import Point
 
 

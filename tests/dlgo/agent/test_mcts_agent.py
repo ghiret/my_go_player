@@ -8,14 +8,15 @@ project's requirements and to ensure correctness and adherence to the book's con
 """
 
 import math
-from typing import List, Optional
+from typing import List
 from unittest.mock import Mock, patch
 
 import pytest
 
 from dlgo.agent.mcts_agent import MCTSAgent, uct_score
-from dlgo.goboard_slow import GameState, Move
+from dlgo.gamestate import GameState
 from dlgo.gotypes import Player, Point
+from dlgo.move import Move
 from misc.board_utils import create_board_from_ascii
 
 

@@ -8,14 +8,14 @@ The code may have been modified and adapted for educational purposes.
 
 import time
 
-from dlgo import agent
-from dlgo import goboard_slow as goboard
-from dlgo import gotypes, utils
+from dlgo import agent, gotypes, utils
+from dlgo.gamestate import GameState
+from dlgo.move import Move
 
 
 def main():
     board_size = 9
-    game = goboard.GameState.new_game(board_size)
+    game = GameState.new_game(board_size)
     bot = agent.random_bot.RandomBot()
 
     while not game.is_over():
@@ -26,7 +26,7 @@ def main():
         if game.next_player == gotypes.Player.black:
             human_move = input("-- ")
             point = utils.point_from_coords(human_move.strip())
-            move = goboard.Move.play(point)
+            move = Move.play(point)
         else:
             move = bot.select_move(game)
         utils.print_move(game.next_player, move)

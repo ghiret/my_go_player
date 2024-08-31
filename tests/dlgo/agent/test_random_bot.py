@@ -10,7 +10,7 @@ project's requirements and to ensure correctness and adherence to the book's con
 import pytest
 
 from dlgo.agent.random_bot import RandomBot
-from dlgo.goboard_slow import GameState
+from dlgo.gamestate import GameState
 from dlgo.gotypes import Player, Point
 
 
