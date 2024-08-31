@@ -150,3 +150,27 @@ def test_move_as_dict_key():
 
     with pytest.raises(KeyError):
         _ = move_dict[Move.play(Point(5, 5))]
+
+
+def test_move_str_representation():
+    """
+    Test the string representation of Move objects.
+    """
+    # Test play move
+    play_move = Move.play(Point(3, 4))
+    assert str(play_move) == "(r 3, c 4)"
+
+    # Test pass move
+    pass_move = Move.pass_turn()
+    assert str(pass_move) == "pass"
+
+    # Test resign move
+    resign_move = Move.resign()
+    assert str(resign_move) == "resign"
+
+    # Test edge cases
+    edge_move1 = Move.play(Point(1, 1))
+    assert str(edge_move1) == "(r 1, c 1)"
+
+    edge_move2 = Move.play(Point(19, 19))
+    assert str(edge_move2) == "(r 19, c 19)"
