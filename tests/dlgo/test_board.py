@@ -9,10 +9,10 @@ project's requirements and to ensure correctness and adherence to the book's con
 
 import pytest
 
-from dlgo.goboard_slow import Board
+from dlgo.board import Board
 from dlgo.gostring import GoString
 from dlgo.gotypes import Player, Point
-from misc.board_utils import create_board_from_ascii
+from misc.board_utils import create_board_from_ascii, print_board
 
 
 @pytest.fixture
@@ -283,4 +283,6 @@ def test_fail_to_self_capture_in_bottom_right_corner():
       2 W B
     """
     )
+    print(f"board: {type(board)}")
+    # print(board_after_capture.__hash__())
     assert board == board_after_capture, "Boards should be equal after the same capture occurs"

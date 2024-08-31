@@ -3,7 +3,7 @@ from io import StringIO
 
 import pytest
 
-from dlgo.goboard_slow import Board
+from dlgo.board import Board
 from dlgo.gotypes import Player, Point
 from misc.board_utils import create_board_from_ascii, print_board
 

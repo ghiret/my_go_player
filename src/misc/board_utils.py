@@ -9,7 +9,7 @@ project's requirements and to ensure correctness and adherence to the book's con
 
 import os
 
-from dlgo.goboard_slow import Board
+from dlgo.board import Board
 from dlgo.gotypes import Player, Point
 
 

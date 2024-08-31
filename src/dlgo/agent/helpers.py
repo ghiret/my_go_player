@@ -6,7 +6,7 @@ Original code repository: https://github.com/maxpumperla/deep_learning_and_the_g
 The code may have been modified and adapted for educational purposes.
 """
 
-from dlgo.goboard_slow import Board
+from dlgo.board import Board
 from dlgo.gotypes import Point
 
 

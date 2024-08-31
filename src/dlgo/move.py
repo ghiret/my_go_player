@@ -1,4 +1,3 @@
-
 """
 This file is based on code from the book "Deep Learning and the Game of Go"
 by Max Pumperla and Kevin Ferguson (Manning Publications, 2019).
@@ -13,6 +12,8 @@ import copy
 from typing import FrozenSet, List, Optional, Tuple
 
 from dlgo.gotypes import Player, Point
+
+
 class Move:
     def __init__(self, point: Optional[Point] = None, is_pass: bool = False, is_resign: bool = False):
         assert (point is not None) ^ is_pass ^ is_resign

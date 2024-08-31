@@ -13,8 +13,10 @@ from unittest.mock import Mock, patch
 import pytest
 
 from dlgo.agent.mcts_node import MCTSNode
-from dlgo.goboard_slow import Board, GameState, Move
+from dlgo.board import Board
+from dlgo.goboard_slow import GameState
 from dlgo.gotypes import Player, Point
+from dlgo.move import Move
 
 
 @pytest.fixture

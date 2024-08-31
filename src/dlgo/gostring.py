@@ -51,7 +51,6 @@ class GoString:
 
     def __hash__(self) -> int:
         return hash((self.color, self.stones, self.liberties))
-    
 
     def __deepcopy__(self, memodict={}):
         return GoString(self.color, self.stones, copy.deepcopy(self.liberties))

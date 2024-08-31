@@ -12,8 +12,9 @@ from io import StringIO
 
 import pytest
 
-from dlgo.goboard_slow import Board, Move
+from dlgo.board import Board
 from dlgo.gotypes import Player, Point
+from dlgo.move import Move
 from dlgo.utils import point_from_coords, print_board, print_move
 
 
