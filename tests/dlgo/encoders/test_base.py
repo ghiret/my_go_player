@@ -11,7 +11,7 @@ import pytest
 
 from dlgo.board import Board
 from dlgo.encoders.base import Encoder
-from dlgo.goboard_slow import GameState
+from dlgo.gamestate import GameState
 from dlgo.gotypes import Player, Point
 
 

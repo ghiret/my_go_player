@@ -11,7 +11,7 @@ import os
 
 from PIL import Image, ImageDraw, ImageFont
 
-from dlgo.goboard_slow import GameState
+from dlgo.gamestate import GameState
 from dlgo.gotypes import Player, Point
 
 

@@ -10,7 +10,7 @@ import argparse
 
 import numpy as np
 
-from dlgo import goboard_fast as goboard
+from dlgo import gamestate as goboard
 from dlgo.agent import mcts_agent
 from dlgo.encoders.base import get_encoder_by_name
 from dlgo.utils import print_board, print_move

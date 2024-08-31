@@ -9,7 +9,8 @@ The code may have been modified and adapted for educational purposes.
 import random
 from typing import TYPE_CHECKING, List, Optional
 
-from dlgo.goboard_slow import GameState, Move
+from dlgo.gamestate import GameState
+from dlgo.move import Move
 from dlgo.gotypes import Player
 
 

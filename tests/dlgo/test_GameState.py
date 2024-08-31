@@ -10,7 +10,7 @@ project's requirements and to ensure correctness and adherence to the book's con
 import pytest
 
 from dlgo.board import Board
-from dlgo.goboard_fast import GameState
+from dlgo.gamestate import GameState
 from dlgo.gotypes import Player, Point
 from dlgo.move import Move
 from dlgo.visualizer import GameVisualizer

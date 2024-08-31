@@ -9,7 +9,7 @@ The code may have been modified and adapted for educational purposes.
 import numpy as np
 
 from dlgo.encoders.base import Encoder
-from dlgo.goboard_slow import GameState
+from dlgo.gamestate import GameState
 from dlgo.gotypes import Point
 
 
