@@ -28,3 +28,5 @@ repos:
       - id: mypy
         files: '.*\.pyi?$'
         exclude: '.*_pb2\.pyi?$'
+        additional_dependencies:
+          - types-six
