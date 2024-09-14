@@ -9,10 +9,8 @@
       
       
       
-        <link rel="prev" href="../about/">
+        <link rel="prev" href="../chapter7/">
       
-      
-        <link rel="next" href="../chapter6/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -20,7 +18,7 @@
     
     
       
-        <title>Getting Started - My Deep Learning Go Bot</title>
+        <title>API Reference - My Deep Learning Go Bot</title>
       
     
     
@@ -61,11 +59,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#getting-started" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -98,7 +91,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Getting Started
+              API Reference
             
           </span>
         </div>
@@ -228,30 +221,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Getting Started
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -260,62 +233,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    <span class="md-ellipsis">
-      Prerequisites
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Installation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#verifying-installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Verifying Installation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Next Steps
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -408,10 +325,17 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../api-reference/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -420,6 +344,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -441,52 +366,6 @@
   
   
   
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    <span class="md-ellipsis">
-      Prerequisites
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Installation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#verifying-installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Verifying Installation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Next Steps
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
   
 </nav>
                   </div>
@@ -501,44 +380,9 @@
                   
 
 
-<h1 id="getting-started">Getting Started</h1>
-<p>This guide will help you set up and start using the Deep Learning and Go Project.</p>
-<h2 id="prerequisites">Prerequisites</h2>
-<ul>
-<li>Python 3.7 or higher</li>
-<li>Git</li>
-<li>Poetry (for dependency management)</li>
-</ul>
-<h2 id="installation">Installation</h2>
-<ol>
-<li>
-<p>Clone the repository:
-   <code>git clone https://github.com/ghiret/my_go_player.git
-   cd my_go_player</code></p>
-</li>
-<li>
-<p>Install dependencies using Poetry:
-   <code>poetry install</code></p>
-</li>
-<li>
-<p>(Optional) If you're using an Apple Silicon Mac and want to configure GPU support:
-   <code>python3.11 -m venv venv311
-   source venv311/bin/activate
-   poetry install
-   poetry run python src/misc/validate_gpu_config.py</code></p>
-</li>
-</ol>
-<h2 id="verifying-installation">Verifying Installation</h2>
-<p>To ensure everything is set up correctly, you can run the unit tests:</p>
-<pre><code>poetry run pytest
-</code></pre>
-<h2 id="next-steps">Next Steps</h2>
-<p>Now that you have the project set up, you can explore the different components:</p>
-<ul>
-<li>Check out the <a href="../chapter6/">Chapter 6 Guide</a> to start developing a machine learning application for Go.</li>
-<li>Move on to the <a href="../chapter7/">Chapter 7 Guide</a> to learn about processing and learning from Go game data.</li>
-</ul>
-<p>For more detailed information about the project structure and components, refer to the <a href="../about/">About</a> page.</p>
+  <h1>API Reference</h1>
+
+
 
 
 
