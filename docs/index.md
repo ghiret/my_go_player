@@ -21,6 +21,7 @@ This project serves as a learning exercise and a practical application of deep l
 - [About](about.md): Detailed information about the project, its goals, and technical stack.
 - [Getting Started](getting-started.md): Instructions on how to set up and start using the project.
 - Chapter Guides:
+  - [Chapters 1 to 5: Initial steps](chapters1-5.md): Initial chapters and first scripts and experiments.
   - [Chapter 6: Developing a Machine Learning Application](chapter6.md): Guide for running Chapter 6 related code.
   - [Chapter 7: Learning from Data](chapter7.md): Guide for running Chapter 7 related code.
 - [API Reference](api-reference.md): Documentation of the project's modules and functions.
