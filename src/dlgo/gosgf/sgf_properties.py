@@ -17,8 +17,6 @@ points.
 Adapted from gomill by Matthew Woodcraft, https://github.com/mattheww/gomill
 """
 
-from __future__ import absolute_import
-
 import codecs
 from math import isinf, isnan
 

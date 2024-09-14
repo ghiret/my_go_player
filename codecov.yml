@@ -4,4 +4,3 @@ ignore:
   - src/scripts/human_vs_random_bot.py
   - src/scripts/generate_zobrist.py
   - src/dlgo/data/index_processing.py
-  - srt/dlgo/gosgf/
