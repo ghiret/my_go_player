@@ -10,32 +10,38 @@ on:
     branches:
       - '**'
 
+# Add this permissions block
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build-docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    
+    - uses: actions/checkout@v5
+
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.x'
-    
+        python-version: 3.11
+
     - name: Install dependencies
       run: |
         pip install mkdocs-material
         pip install mkdocstrings[python]
-    
+
     - name: Build docs
       run: mkdocs build
-    
+
     - name: Deploy to GitHub Pages
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./site
-        
+
     - name: Deploy PR preview
       if: github.event_name == 'pull_request' && github.event.action != 'closed'
       uses: peaceiris/actions-gh-pages@v3
@@ -43,28 +49,28 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./site
         destination_dir: pr-${{ github.event.number }}
-        
+
   cleanup-pr-preview:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-      
+
     - name: Remove PR preview
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./empty-dir
         destination_dir: pr-${{ github.event.number }}
-        
+
   cleanup-deleted-branch:
     if: github.event_name == 'delete'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-      
+
     - name: Remove deleted branch preview
       uses: peaceiris/actions-gh-pages@v3
       with:
