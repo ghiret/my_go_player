@@ -1,0 +1,6 @@
+site_name: My Deep Learning Go Bot
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - About: about.md
