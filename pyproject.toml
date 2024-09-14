@@ -29,6 +29,8 @@ tensorflow-macos = { version = "2.16.2", markers = "sys_platform == 'darwin'" }
 psutil = "^6.0.0"
 mkdocs = "^1.6.1"
 mkdocs-material = "^9.5.34"
+types-six = "^1.16.21.20240513"
+mypy = "^1.11.2"
 
 [tool.poetry.scripts]
 app = "dlgo.dlgo:main"

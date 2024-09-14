@@ -131,6 +131,10 @@ env.bak/
 venv.bak/
 venv311/
 
+# Downloaded data
+data/*
+kgs_index.html
+
 # Spyder project settings
 .spyderproject
 .spyproject

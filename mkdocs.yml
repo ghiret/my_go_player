@@ -6,6 +6,7 @@ nav:
   - About: about.md
   - Getting Started: getting-started.md
   - Chapter Guides:
+    - Chapters 1 to 5 - Initial chapters: chapters1-5.md
     - Chapter 6 - Developing a Machine Learning Application: chapter6.md
     - Chapter 7 - Learning from Data: chapter7.md
   - API Reference: api-reference.md
