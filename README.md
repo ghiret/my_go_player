@@ -34,6 +34,10 @@ The development process for this project follows these steps:
 - The majority of the unit tests are generated using Large Language Models (LLMs), primarily Claude 3.5 Sonnet and occasionally GPT-4.
 - These AI-generated tests are then reviewed, modified as necessary, and integrated into the project.
 
+## Documentation
+
+The full project documentation is available at [https://ghiret.github.io/my_go_player/](https://ghiret.github.io/my_go_player/). This documentation includes detailed explanations of the project's components, usage instructions, and additional resources.
+
 ## Licensing and Attribution
 
 As of the creation of this project, the original book and GitHub repository do not specify a license. This project is created for educational purposes and is not intended for commercial use. All credit for the original concepts, algorithms, and code structure goes to the authors of "Deep Learning and the Game of Go."
@@ -51,22 +55,7 @@ While this is primarily a personal learning project, observations, suggestions, 
 ## Acknowledgements
 
 Special thanks to Max Pumperla and Kevin Ferguson for writing "Deep Learning and the Game of Go," which serves as the foundation and inspiration for this project.
-### How to play random bot vs random bot
 
-```bash
-poetry run python src/scripts/random_bot_vs_random_bot.py
-```
-
-### How to play against the random bot
-
-```bash
-poetry run python src/scripts/human_vs_random_bot.py
-```
-
-### How to generate mcts data
-```bash
- poetry run python src/scripts/generate_mcts_games.py -n 20 --board-out features.npy --move-out labels.npy -b 5
-```
 
 ### Configuring the gpu for Apple sillicon
 I have not been able to get the GPUs working with devcontainer, so I am resorting to a python virtual environment.
