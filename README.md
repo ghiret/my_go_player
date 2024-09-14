@@ -67,3 +67,12 @@ poetry run python src/scripts/human_vs_random_bot.py
 ```bash
  poetry run python src/scripts/generate_mcts_games.py -n 20 --board-out features.npy --move-out labels.npy -b 5
 ```
+
+### Configuring the gpu for Apple sillicon
+I have not been able to get the GPUs working with devcontainer, so I am resorting to a python virtual environment.
+```bash
+python3.11 -m venv venv311
+source venv311/bin/activate
+poetry install
+poetry run python src/misc/validate_gpu_config.py
+```
