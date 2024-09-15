@@ -1,4 +1,4 @@
-# Copied from https://github.com/maxpumperla/deep_learning_and_the_game_of_go/blob/master/code/dlgo/data/processor.py
+# Copied from https://github.com/maxpumperla/deep_learning_and_the_game_of_go/blob/master/code/dlgo/data/parallel_processor.py
 """
 This file is based on code from the book "Deep Learning and the Game of Go"
 by Max Pumperla and Kevin Ferguson (Manning Publications, 2019).
@@ -6,31 +6,46 @@ Original code repository: https://github.com/maxpumperla/deep_learning_and_the_g
 
 The code may have been modified and adapted for educational purposes.
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import glob
 import gzip
+import multiprocessing
+import os
 import os.path
 import shutil
+import sys
 import tarfile
 
 import numpy as np
 from keras.utils import to_categorical
 
+from dlgo.board import Board
+from dlgo.data.generator import DataGenerator
 from dlgo.data.index_processor import KGSIndex
 from dlgo.data.sampling import Sampler
 from dlgo.encoders.base import get_encoder_by_name
-from dlgo.goboard_fast import Board, GameState, Move
+from dlgo.gamestate import GameState
 from dlgo.gosgf.sgf import Sgf_game
 from dlgo.gotypes import Player, Point
+from dlgo.move import Move
+
+
+def worker(jobinfo):
+    try:
+        clazz, encoder, zip_file, data_file_name, game_list = jobinfo
+        clazz(encoder=encoder).process_zip(zip_file, data_file_name, game_list)
+    except (KeyboardInterrupt, SystemExit):
+        raise Exception(">>> Exiting child process.")
 
 
 class GoDataProcessor:
-    def __init__(self, encoder="oneplane", data_directory="data"):
+    def __init__(self, encoder="simple", data_directory="data"):
+        self.encoder_string = encoder
         self.encoder = get_encoder_by_name(encoder, 19)
         self.data_dir = data_directory
 
-    def load_go_data(self, data_type="train", num_samples=1000):
+    def load_go_data(self, data_type="train", num_samples=1000, use_generator=False):
         """
         Load Go data from the specified data_type and number of samples.
 
@@ -42,31 +57,21 @@ class GoDataProcessor:
             features_and_labels (list): A list of features and labels for the loaded data.
         """
         index = KGSIndex(data_directory=self.data_dir)
-        # We download all games from KGS to our local data directory. If data is available, it won't be downloaded again.
         index.download_files()
 
         sampler = Sampler(data_dir=self.data_dir)
-        # The `Sampler` instance selects the specified number of games for a data type.
         data = sampler.draw_data(data_type, num_samples)
 
-        zip_names = set()
-        indices_by_zip_name = {}
-        for filename, index in data:
-            # We collect all zip file names contained in the data in a list.
-            zip_names.add(filename)
-            if filename not in indices_by_zip_name:
-                indices_by_zip_name[filename] = []
-            # Then we group all SGF file indices by zip file name.
-            indices_by_zip_name[filename].append(index)
-        for zip_name in zip_names:
-            base_name = zip_name.replace(".tar.gz", "")
-            data_file_name = base_name + data_type
-            if not os.path.isfile(self.data_dir + "/" + data_file_name):
-                # The zip files are then processed individually.
-                self.process_zip(zip_name, data_file_name, indices_by_zip_name[zip_name])
-        # Features and labels from each zip are then aggregated and returned.
-        features_and_labels = self.consolidate_games(data_type, data)
-        return features_and_labels
+        # Map workload to CPUs
+        self.map_to_workers(data_type, data)
+        if use_generator:
+            generator = DataGenerator(self.data_dir, data)
+            # Either return a Go data generator...
+            return generator
+        else:
+            features_and_labels = self.consolidate_games(data_type, data)
+            # ... or return consolidated data as before.
+            return features_and_labels
 
     def unzip_data(self, zip_file_name):
         # Unpack the `gz` file into a `tar` file.
@@ -204,6 +209,32 @@ class GoDataProcessor:
             first_move_done = True
             game_state = GameState(go_board, Player.white, None, move)
         return game_state, first_move_done
+
+    def map_to_workers(self, data_type, samples):
+        zip_names = set()
+        indices_by_zip_name = {}
+        for filename, index in samples:
+            zip_names.add(filename)
+            if filename not in indices_by_zip_name:
+                indices_by_zip_name[filename] = []
+            indices_by_zip_name[filename].append(index)
+
+        zips_to_process = []
+        for zip_name in zip_names:
+            base_name = zip_name.replace(".tar.gz", "")
+            data_file_name = base_name + data_type
+            if not os.path.isfile(self.data_dir + "/" + data_file_name):
+                zips_to_process.append((self.__class__, self.encoder_string, zip_name, data_file_name, indices_by_zip_name[zip_name]))
+
+        cores = multiprocessing.cpu_count()  # Determine number of CPU cores and split work load among them
+        pool = multiprocessing.Pool(processes=cores)
+        p = pool.map_async(worker, zips_to_process)
+        try:
+            _ = p.get()
+        except KeyboardInterrupt:  # Caught keyboard interrupt, terminating workers
+            pool.terminate()
+            pool.join()
+            sys.exit(-1)
 
     def num_total_examples(self, zip_file, game_list, name_list):
         total_examples = 0
