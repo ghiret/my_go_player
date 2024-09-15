@@ -1,4 +1,12 @@
-# This Source Code Form is subject to the terms of the Mozilla Public License,
+# Copied from https://github.com/maxpumperla/deep_learning_and_the_game_of_go/blob/master/code/dlgo/data/index_processor.py
+"""
+This file is based on code from the book "Deep Learning and the Game of Go"
+by Max Pumperla and Kevin Ferguson (Manning Publications, 2019).
+Original code repository: https://github.com/maxpumperla/deep_learning_and_the_game_of_go
+
+The code may have been modified and adapted for educational purposes.
+"""
+#  This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file, You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 from __future__ import absolute_import, print_function
