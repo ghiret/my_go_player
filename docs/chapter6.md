@@ -2,31 +2,39 @@
 
 This guide covers the code and concepts related to Chapter 6 of "Deep Learning and the Game of Go."
 
-## Running a Game: Random Bot vs Random Bot
 
-To simulate a game between two random bots:
+## Generating MCTS Game Data
 
-```bash
-poetry run python src/scripts/random_bot_vs_random_bot.py
-```
-
-This script demonstrates the basic game mechanics and how simple AI players make moves.
-
-## Playing Against the Random Bot
-
-To play a game against the random bot:
+To generate game data using Monte Carlo Tree Search (MCTS):
 
 ```bash
-poetry run python src/scripts/human_vs_random_bot.py
+poetry run python src/scripts/generate_mcts_games.py -n 20 --board-out features.npy --move-out labels.npy -b 5
 ```
 
-This interactive script allows you to play against a bot that makes random moves, helping you understand the game flow and bot interaction.
+This command:
+- Generates 20 games (`-n 20`)
+- Saves board positions to `features.npy`
+- Saves corresponding moves to `labels.npy`
+- Uses a 5x5 board (`-b 5`)
 
-## Understanding the Code
+You can adjust these parameters as needed.
 
-These scripts utilize the core game logic and the random bot implementation. Key components include:
+## Understanding the Generated Data
 
-- `src/go_engine/`: Contains the core Go game logic.
-- `src/bots/random_bot.py`: Implements the random bot player.
+- `features.npy`: Contains the board positions (features) for each move.
+- `labels.npy`: Contains the corresponding moves (labels) made by the MCTS bot.
 
-Explore these files to understand how the game state is managed and how the random bot makes decisions.
+This data can be used to train machine learning models to predict moves based on board positions.
+
+## Next Steps
+
+After generating the data:
+1. Explore the generated `.npy` files using numpy to understand their structure.
+2. Use this data to train a neural network model (covered in later chapters).
+
+## Key Components
+
+- `src/scripts/generate_mcts_games.py`: The main script for generating game data.
+- `src/bots/mcts_bot.py`: Implements the Monte Carlo Tree Search bot.
+
+Dive into these files to understand how MCTS works and how the game data is generated and structured.
