@@ -21,9 +21,9 @@ import numpy as np
 from keras.utils import to_categorical
 
 from dlgo.board import Board
-from dlgo.data.generator import DataGenerator
 from dlgo.data.index_processor import KGSIndex
 from dlgo.data.sampling import Sampler
+from dlgo.data.sequence import DataSequence
 from dlgo.encoders.base import get_encoder_by_name
 from dlgo.gamestate import GameState
 from dlgo.gosgf.sgf import Sgf_game
@@ -45,7 +45,7 @@ class GoDataProcessor:
         self.encoder = get_encoder_by_name(encoder, 19)
         self.data_dir = data_directory
 
-    def load_go_data(self, data_type="train", num_samples=1000, use_generator=False):
+    def load_go_data(self, data_type="train", num_samples=1000):
         """
         Load Go data from the specified data_type and number of samples.
 
@@ -57,21 +57,31 @@ class GoDataProcessor:
             features_and_labels (list): A list of features and labels for the loaded data.
         """
         index = KGSIndex(data_directory=self.data_dir)
+        # We download all games from KGS to our local data directory. If data is available, it won't be downloaded again.
         index.download_files()
 
         sampler = Sampler(data_dir=self.data_dir)
+        # The `Sampler` instance selects the specified number of games for a data type.
         data = sampler.draw_data(data_type, num_samples)
-
-        # Map workload to CPUs
-        self.map_to_workers(data_type, data)
-        if use_generator:
-            generator = DataGenerator(self.data_dir, data)
-            # Either return a Go data generator...
-            return generator
-        else:
-            features_and_labels = self.consolidate_games(data_type, data)
-            # ... or return consolidated data as before.
-            return features_and_labels
+        zip_names = set()
+        game_numbers_by_zip_name = {}
+        for filename, game_number in data:
+            print(f"filename= {filename} and game_number: {game_number}")
+            # We collect all zip file names contained in the data in a list.
+            zip_names.add(filename)
+            if filename not in game_numbers_by_zip_name:
+                game_numbers_by_zip_name[filename] = []
+            # Then we group all SGF file game numbers by zip file name.
+            game_numbers_by_zip_name[filename].append(game_number)
+        for zip_name in zip_names:
+            base_name = zip_name.replace(".tar.gz", "")
+            data_file_name = base_name + data_type
+            if not os.path.isfile(self.data_dir + "/" + data_file_name):
+                # The zip files are then processed individually.
+                self.process_zip(zip_name, data_file_name, game_numbers_by_zip_name[zip_name])
+        # Features and labels from each zip are then aggregated and returned.
+        features_and_labels = self.consolidate_games(data_type, data)
+        return features_and_labels
 
     def unzip_data(self, zip_file_name):
         # Unpack the `gz` file into a `tar` file.
@@ -190,10 +200,14 @@ class GoDataProcessor:
                 label_list.append(y)
         features = np.concatenate(feature_list, axis=0)
         labels = np.concatenate(label_list, axis=0)
-        np.save("{}/features_{}.npy".format(self.data_dir, data_type), features)
-        np.save("{}/labels_{}.npy".format(self.data_dir, data_type), labels)
 
-        return features, labels
+        features_filename = f"{self.data_dir}/features_{data_type}.npy"
+        labels_filename = f"{self.data_dir}/labels_{data_type}.npy"
+
+        np.save(features_filename, features)
+        np.save(labels_filename, labels)
+
+        return features_filename, labels_filename
 
     @staticmethod
     def get_handicap(sgf):

@@ -100,26 +100,77 @@ class Sampler:
                 (filename, index) = eval(line)
                 self.test_games.append((filename, index))
 
-    def draw_training_samples(self, num_sample_games):
-        """Draw training games, not overlapping with any of the test games."""
+    def draw_training_samples(self, num_sample_games: int):
+        """
+        Draw a specified number of training game samples, ensuring no overlap with test games.
+
+        This method selects random game samples from available game files up to a certain year.
+        It ensures that the selected samples are not part of the predefined test set.
+
+        Args:
+            num_sample_games (int): The number of game samples to draw.
+
+        Returns:
+            List[Tuple[str, int]]: A list of tuples, each containing a filename and game number,
+            representing the selected game samples.
+
+        Raises:
+            ValueError: If num_sample_games is greater than the number of available games.
+
+        Note:
+            - The method uses self.data_dir to locate game data.
+            - It respects self.cap_year as the upper limit for game file years.
+            - It assumes self.test_games is a pre-existing set of games to be excluded.
+        """
+
+        # Initialize an empty list to store all available games
         available_games = []
+
+        # Create an index object to access game data
         index = KGSIndex(data_directory=self.data_dir)
+
+        # Iterate through each file in the index
         for fileinfo in index.file_info:
             filename = fileinfo["filename"]
+
+            # Extract the year from the filename
             year = int(filename.split("-")[1].split("_")[0])
+
+            # Skip files from years after the cap year
             if year > self.cap_year:
                 continue
-            num_games = fileinfo["num_games"]
-            for i in range(num_games):
-                available_games.append((filename, i))
-        print("total num games: " + str(len(available_games)))
 
-        sample_set = set()
+            # Get the number of games in this file
+            num_games = fileinfo["num_games"]
+
+            # Add each game from this file to the available_games list
+            for game_number in range(num_games):
+                available_games.append((filename, game_number))
+                print((filename, game_number))  # Print each game added
+
+        # Print the total number of available games
+        print(f"Total number of games: {len(available_games)}")
+
+        # Check if we have enough games to sample from
+        if num_sample_games > len(available_games):
+            raise ValueError("Not enough games to sample from")
+
+        # Initialize an empty set to store the selected samples
+        sample_set = set()  # type: ignore
+
+        # Keep selecting random samples until we have the desired number
         while len(sample_set) < num_sample_games:
+            # Randomly choose a game from available_games
             sample = random.choice(available_games)
+
+            # Only add the sample if it's not in the test set
             if sample not in self.test_games:
                 sample_set.add(sample)
-        print("Drawn " + str(num_sample_games) + " samples:")
+
+        # Print the number of samples drawn
+        print(f"Drawn {num_sample_games} samples")
+
+        # Return the sample set as a list
         return list(sample_set)
 
     def draw_all_training(self):
