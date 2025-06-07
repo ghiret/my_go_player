@@ -9,33 +9,31 @@ on:
       - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.11
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
 
-    - name: Install Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          sudo mv ~/.local/bin/uv /usr/local/bin/uv
 
-    - name: Add Poetry to PATH
-      run: echo "${HOME}/.local/bin" >> $GITHUB_PATH
+      - name: Install test dependencies
+        run: |
+          uv pip install --system ".[dev]"
 
-    - name: Install dependencies
-      run: |
-        poetry install
+      - name: Run tests with coverage
+        run: |
+          pytest --cov=src --cov-report=xml
 
-    - name: Run tests with coverage
-      run: |
-        poetry run pytest --cov=src --cov-report=xml
-
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4.0.1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
