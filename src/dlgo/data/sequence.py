@@ -7,13 +7,12 @@ Original code repository: https://github.com/maxpumperla/deep_learning_and_the_g
 The code may have been modified and adapted for educational purposes.
 This has been adapted to keras v3 using Anthropic's Claude model.
 """
-import glob
-
 import numpy as np
-from tensorflow.keras.utils import Sequence, to_categorical
+import torch
+from torch.utils.data import Dataset
 
 
-class DataSequence(Sequence):
+class DataSequence(Dataset):
     def __init__(self, data_directory, samples, batch_size=128, num_classes=19 * 19):
         super().__init__()
         self.data_directory = data_directory
@@ -24,7 +23,6 @@ class DataSequence(Sequence):
         # Load all data into memory
         self.features = np.load(self.features_file)
         self.labels = np.load(self.labels_file)
-
         self.num_samples = len(self.features)
 
     def __len__(self):
@@ -36,28 +34,14 @@ class DataSequence(Sequence):
         batch_features = self.features[start:end]
         batch_labels = self.labels[start:end]
 
-        # Print shapes before reshaping and encoding
-        # print(f"Original batch_features shape: {batch_features.shape}")
-        # print(f"Original batch_labels shape: {batch_labels.shape}")
+        batch_features = torch.from_numpy(batch_features).float()
 
-        # Ensure features are in the correct shape (batch_size, 19, 19, 1)
-        batch_features = batch_features.reshape(-1, 19, 19, 1)
-
-        # Print shapes after reshaping
-        # print(f"Reshaped batch_features shape: {batch_features.shape}")
-
-        # Ensure labels are integers before one-hot encoding
-        # print(batch_labels)
-        # Print shapes before one-hot encoding
-        # print(f"batch_labels shape: {batch_labels.shape}")
+        # If labels are already one-hot, convert to class indices
         if batch_labels.ndim > 1 and batch_labels.shape[1] == self.num_classes:
             batch_labels = np.argmax(batch_labels, axis=1)
 
-        # Convert labels to one-hot encoding with the correct shape (batch_size, 361)
-        batch_labels = to_categorical(batch_labels, self.num_classes)
-
-        # Print shapes after one-hot encoding
-        # print(f"One-hot encoded batch_labels shape: {batch_labels.shape}")
+        # Convert labels to torch tensor (class indices)
+        batch_labels = torch.from_numpy(batch_labels).long()
 
         return batch_features, batch_labels
 

@@ -22,7 +22,7 @@ The primary motivation behind this project is to gain a comprehensive understand
 ## Technical Stack
 
 - **Programming Language**: Python
-- **Deep Learning Framework**: TensorFlow (with potential future ports to PyTorch)
+- **Deep Learning Framework**: PyTorch
 - **Testing Framework**: pytest
 - **Package Management**: uv
 - **Version Control**: Git

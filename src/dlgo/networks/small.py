@@ -1,41 +1,63 @@
 # Copied from https://github.com/maxpumperla/deep_learning_and_the_game_of_go/blob/master/code/dlgo/networks/small.py
 from __future__ import absolute_import
 
-import keras
-from keras.layers import Activation, Conv2D, Dense, Flatten, Input, ZeroPadding2D
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
 
-def layers(input_shape):
-    return [
-        # Add an Input layer to specify the input shape
-        Input(shape=input_shape),
-        # We use zero padding layers to enlarge input images.
-        ZeroPadding2D(padding=3, data_format="channels_last"),
-        Conv2D(48, (7, 7), data_format="channels_last"),
-        Activation("relu"),
-        ZeroPadding2D(padding=2, data_format="channels_last"),
-        Conv2D(32, (5, 5), data_format="channels_last"),
-        Activation("relu"),
-        ZeroPadding2D(padding=2, data_format="channels_last"),
-        Conv2D(32, (5, 5), data_format="channels_last"),
-        Activation("relu"),
-        ZeroPadding2D(padding=2, data_format="channels_last"),
-        Conv2D(32, (5, 5), data_format="channels_last"),
-        Activation("relu"),
-        Flatten(),
-        Dense(512),
-        Activation("relu"),
-    ]
+class SmallGoCNN(nn.Module):
+    def __init__(self, encoder, go_board_rows, go_board_cols, num_classes):
+        super().__init__()
+        in_channels = encoder.num_planes
+        self.pad1 = nn.ZeroPad2d(3)  # (left, right, top, bottom)
+        self.conv1 = nn.Conv2d(in_channels, 48, kernel_size=7, padding=0)
+        self.pad2 = nn.ZeroPad2d(2)
+        self.conv2 = nn.Conv2d(48, 32, kernel_size=5, padding=0)
+        self.conv3 = nn.Conv2d(32, 32, kernel_size=5, padding=0)
+        self.conv4 = nn.Conv2d(32, 32, kernel_size=5, padding=0)
+        self.flatten = nn.Flatten()
+        self.fc1 = nn.Linear(self._get_flattened_size(go_board_rows, go_board_cols, in_channels), 512)
+        self.fc2 = nn.Linear(512, num_classes)
+
+    def _get_flattened_size(self, rows, cols, in_channels):
+        # Compute the output size after all conv/pad layers for input shape (batch, in_channels, rows, cols)
+        x = torch.zeros(1, in_channels, rows, cols)
+        x = self.pad1(x)
+        x = self.conv1(x)
+        x = F.relu(x)
+        x = self.pad2(x)
+        x = self.conv2(x)
+        x = F.relu(x)
+        x = self.pad2(x)
+        x = self.conv3(x)
+        x = F.relu(x)
+        x = self.pad2(x)
+        x = self.conv4(x)
+        x = F.relu(x)
+        x = self.flatten(x)
+        return x.shape[1]
+
+    def forward(self, x):
+        x = self.pad1(x)
+        x = self.conv1(x)
+        x = F.relu(x)
+        x = self.pad2(x)
+        x = self.conv2(x)
+        x = F.relu(x)
+        x = self.pad2(x)
+        x = self.conv3(x)
+        x = F.relu(x)
+        x = self.pad2(x)
+        x = self.conv4(x)
+        x = F.relu(x)
+        x = self.flatten(x)
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.fc2(x)
+        x = F.log_softmax(x, dim=1)  # Use log_softmax for classification
+        return x
 
 
 def create_model(encoder, go_board_rows, go_board_cols, num_classes):
-    input_shape = (go_board_rows, go_board_cols, encoder.num_planes)
-    network_layers = layers(input_shape)
-
-    model = keras.Sequential()
-    for layer in network_layers:
-        model.add(layer)
-    model.add(keras.layers.Dense(num_classes, activation="softmax"))
-    model.compile(loss="categorical_crossentropy", optimizer="sgd", metrics=["accuracy"])
-
-    return model
+    return SmallGoCNN(encoder, go_board_rows, go_board_cols, num_classes)

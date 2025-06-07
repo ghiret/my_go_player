@@ -13,7 +13,7 @@ This project serves as a learning exercise and a practical application of deep l
 - Implementation of Go game rules and board representation
 - Various AI players, including random and MCTS-based bots
 - Tools for generating and processing game data
-- Integration with TensorFlow for deep learning models
+- Pytorch for deep learning models
 - Comprehensive unit testing suite
 
 ## Documentation Contents

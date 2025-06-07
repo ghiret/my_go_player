@@ -16,6 +16,7 @@ import os
 import sys
 
 import six
+from tqdm import tqdm
 
 if sys.version_info[0] == 3:
     from urllib.request import urlopen, urlretrieve
@@ -93,7 +94,7 @@ class KGSIndex:
             index_file.close()
         return index_contents
 
-    def load_index(self):
+    def load_index(self, verbose=False):
         """Create the actual index representation from the previously downloaded or cached html."""
         index_contents = self.create_index_page()
         split_page = [item for item in index_contents.split('<a href="') if item.startswith("https://")]
@@ -101,11 +102,12 @@ class KGSIndex:
             download_url = item.split('">Download')[0]
             if download_url.endswith(".tar.gz"):
                 self.urls.append(download_url)
-        for url in self.urls:
+        for url in tqdm(self.urls, desc="Processing URLs", unit="url"):
             filename = os.path.basename(url)
             split_file_name = filename.split("-")
             num_games = int(split_file_name[len(split_file_name) - 2])
-            print(filename + " " + str(num_games))
+            if verbose:
+                print(filename + " " + str(num_games))
             self.file_info.append({"url": url, "filename": filename, "num_games": num_games})
 
 

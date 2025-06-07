@@ -8,17 +8,19 @@ The code may have been modified and adapted for educational purposes.
 """
 from __future__ import print_function
 
+import keras_core as keras
+
 # tag::mcts_go_cnn_simple_preprocessing[]
 import numpy as np
-import tensorflow as tf
 from check_for_gpu import check_gpu_availability
 from keras.layers import Conv2D, Dense, Flatten  # <1>
 from keras.models import Sequential
 
+# Ensure GPU is available and set up
 check_gpu_availability()
 np.random.seed(123)
-X = np.load("src/dlgo/generated_games/features-40k.npy")
-Y = np.load("src/dlgo/generated_games/labels-40k.npy")
+X = np.load("./src/dlgo/generated_games/features-40k.npy")
+Y = np.load("./src/dlgo/generated_games/labels-40k.npy")
 
 samples = X.shape[0]
 size = 9
