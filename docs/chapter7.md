@@ -7,7 +7,7 @@ This guide covers the code and concepts related to Chapter 7 of "Deep Learning a
 The human data is downloaded from the KGS (formerly known as the Kiseido Go Server)
 
 ```bash
-poetry run python src/dlgo/data/index_processor.py
+uv run python src/dlgo/data/index_processor.py
 ```
 
 This will download the data to the `data` folder and it will create the file `kgs_index.html` in the main folder.

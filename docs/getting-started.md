@@ -4,37 +4,52 @@ This guide will help you set up and start using the Deep Learning and Go Project
 
 ## Prerequisites
 
-- Python 3.7 or higher
+- Python 3.11 or higher
 - Git
-- Poetry (for dependency management)
+- uv (for dependency management)
 
-## Installation
+## 🚀 Getting Started
 
 1. Clone the repository:
-   ```
+   ```bash
    git clone https://github.com/ghiret/my_go_player.git
    cd my_go_player
    ```
 
-2. Install dependencies using Poetry:
-   ```
-   poetry install
+2. Install dependencies using [uv](https://github.com/astral-sh/uv):
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   sudo mv ~/.local/bin/uv /usr/local/bin/uv  # optional if not already in PATH
+   uv pip install ".[dev]"
    ```
 
-3. (Optional) If you're using an Apple Silicon Mac and want to configure GPU support:
-   ```
+3. (Optional) If you're on **Apple Silicon (macOS)** and need GPU support:
+   ```bash
    python3.11 -m venv venv311
    source venv311/bin/activate
-   poetry install
-   poetry run python src/misc/validate_gpu_config.py
+   uv pip install ".[dev]"
+   python src/misc/validate_gpu_config.py
    ```
 
-## Verifying Installation
+4. (Optional) On **Linux with CUDA** (e.g., Ubuntu + NVIDIA GPU):
+   ```bash
+   # If inside devcontainer, activate its venv
+   source /home/ubuntu/venv/bin/activate
 
-To ensure everything is set up correctly, you can run the unit tests:
+   # If running locally:
+   python3.11 -m venv .venv
+   source .venv/bin/activate
 
-```
-poetry run pytest
+   uv pip install ".[dev]"
+   python src/misc/validate_gpu_config.py
+   ```
+
+## ✅ Verifying Installation
+
+To ensure everything is working, run the unit tests:
+
+```bash
+pytest
 ```
 
 ## Next Steps
