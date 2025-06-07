@@ -56,12 +56,58 @@ While this is primarily a personal learning project, observations, suggestions, 
 
 Special thanks to Max Pumperla and Kevin Ferguson for writing "Deep Learning and the Game of Go," which serves as the foundation and inspiration for this project.
 
+### 🔧 Configuring GPU Support
 
-### Configuring the gpu for Apple sillicon
-I have not been able to get the GPUs working with devcontainer, so I am resorting to a python virtual environment.
+Depending on your platform, GPU setup varies slightly:
+
+---
+
+#### 🧠 Apple Silicon (macOS + Metal + TensorFlow)
+
+If you're using a Mac with Apple Silicon (M1/M2/M3), `tensorflow-metal` and `tensorflow-macos` provide GPU acceleration.
+
+> Note: GPU access inside devcontainers is **not supported** on macOS, so you’ll need to run locally with a virtual environment.
+
 ```bash
-python3.11 -m venv venv311
-source venv311/bin/activate
-poetry install
-poetry run python src/misc/validate_gpu_config.py
+# Create a Python 3.11 virtual environment
+python3.11 -m venv .venv
+source .venv/bin/activate
+
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+mv ~/.local/bin/uv /usr/local/bin/uv  # may require sudo
+
+# Install dependencies
+uv pip install ".[dev]"
+
+# Validate GPU configuration
+python src/misc/validate_gpu_config.py
 ```
+`tensorflow-macos` and `tensorflow-metal` will automatically be installed on macOS via `pyproject.toml` using uv's platform-aware resolution.
+
+####
+
+If you're using a Linux system with CUDA and a supported NVIDIA driver, GPU access will work **inside devcontainers** and also **locally**.
+
+```bash
+# Inside the devcontainer or your local machine:
+
+# Activate devcontainer's pre-created venv (if inside container)
+source /home/ubuntu/venv/bin/activate
+
+# Or: Create a venv locally (optional if not using container)
+python3.11 -m venv .venv
+source .venv/bin/activate
+
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+sudo mv ~/.local/bin/uv /usr/local/bin/uv
+
+# Install all dependencies (dev includes test tools)
+uv pip install ".[dev]"
+
+# Validate GPU setup
+python src/misc/validate_gpu_config.py
+```
+
+PyTorch with CUDA is pulled from the `pytorch-cu124` index if you're on Linux, thanks to the `pyproject.toml` configuration under `[tool.uv.sources]`.

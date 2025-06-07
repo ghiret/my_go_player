@@ -7,7 +7,7 @@ This guide covers the code and concepts related to the initial chapters, 1 to 5,
 To simulate a game between two random bots:
 
 ```bash
-poetry run python src/scripts/random_bot_vs_random_bot.py
+uv run python src/scripts/random_bot_vs_random_bot.py
 ```
 
 This script demonstrates the basic game mechanics and how simple AI players make moves.
@@ -17,7 +17,7 @@ This script demonstrates the basic game mechanics and how simple AI players make
 To play a game against the random bot:
 
 ```bash
-poetry run python src/scripts/human_vs_random_bot.py
+uv run python src/scripts/human_vs_random_bot.py
 ```
 
 This interactive script allows you to play against a bot that makes random moves, helping you understand the game flow and bot interaction.

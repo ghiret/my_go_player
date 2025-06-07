@@ -8,7 +8,7 @@ This guide covers the code and concepts related to Chapter 6 of "Deep Learning a
 To generate game data using Monte Carlo Tree Search (MCTS):
 
 ```bash
-poetry run python src/scripts/generate_mcts_games.py -n 20 --board-out features.npy --move-out labels.npy -b 5
+uv run python src/scripts/generate_mcts_games.py -n 20 --board-out features.npy --move-out labels.npy -b 5
 ```
 
 This command:
