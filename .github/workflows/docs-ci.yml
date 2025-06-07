@@ -7,13 +7,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
 
-# Permissions are crucial for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Define a concurrency group to cancel in-progress jobs
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -22,30 +20,35 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.11
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
 
-    - name: Install dependencies
-      run: |
-        pip install mkdocs-material
-        pip install mkdocstrings[python]
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          sudo mv ~/.local/bin/uv /usr/local/bin/uv
 
-    - name: Build docs
-      run: mkdocs build
+      - name: Install docs dependencies with uv
+        run: |
+          uv venv
+          uv pip install --system ".[docs]"
 
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-      with:
-        enablement: true
+      - name: Build docs
+        run: mkdocs build
 
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: ./site
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        with:
+          enablement: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
 
   deploy:
     if: github.ref == 'refs/heads/main'
