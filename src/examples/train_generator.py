@@ -20,9 +20,17 @@ def train(model, device, train_loader, optimizer, criterion, epoch):
     for batch_idx, (data, target) in enumerate(tqdm(train_loader, desc=f"\033[92mEpoch {epoch} [train]\033[0m")):
 
         data, target = data.to(device), target.to(device)
-
+        if epoch == 1 and batch_idx == 0:
+            print("Input stats:")
+            print("Input shape:", data.shape)
+            print("Min/Max:", data.min().item(), data.max().item())
+            print("Mean:", data.mean().item())
         optimizer.zero_grad()
         output = model(data)
+        if epoch == 1 and batch_idx == 0:
+            print("Model output stats:")
+            print("Output min/max:", output.min().item(), output.max().item())
+            print("Output[0]:", output[0][:10])
         loss = criterion(output, target)
         loss.backward()
         optimizer.step()
@@ -43,6 +51,7 @@ def evaluate(model, device, test_loader, criterion):
     with torch.no_grad():
         for data, target in tqdm(test_loader, desc="\033[94m[eval]\033[0m"):
             data, target = data.to(device), target.to(device)
+
             output = model(data)
             loss = criterion(output, target)
             total_loss += loss.item() * data.size(0)
@@ -53,6 +62,18 @@ def evaluate(model, device, test_loader, criterion):
     accuracy = correct / total
     print(f"\033[94mTest: Loss={avg_loss:.4f}, Accuracy={accuracy:.4f}\033[0m")
     return avg_loss, accuracy
+
+
+import torch.nn as nn
+
+
+class DummyLinear(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(19 * 19, 361)
+
+    def forward(self, x):
+        return self.fc(x.view(x.size(0), -1))
 
 
 def main():
@@ -72,9 +93,22 @@ def main():
         train_data = processor.load_go_data("train", num_games)
         test_data = processor.load_go_data("test", num_games)
 
-        train_dataset = DataSequence(processor.data_dir, train_data, batch_size, num_classes)
-        test_dataset = DataSequence(processor.data_dir, test_data, batch_size, num_classes)
+        train_dataset = DataSequence(processor.data_dir, train_data, num_classes)
+        test_dataset = DataSequence(processor.data_dir, test_data, num_classes)
 
+        subset = torch.utils.data.Subset(train_dataset, list(range(10)))
+        loader = torch.utils.data.DataLoader(subset, batch_size=2, shuffle=True)
+
+        for epoch in range(1, 30):
+            # model = small.create_model(encoder, go_board_rows, go_board_cols, num_classes).to(device)
+            model = DummyLinear().to(device)  # Using a dummy model for testing
+            optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+            criterion = torch.nn.CrossEntropyLoss()
+
+            train(model, device, loader, optimizer, criterion, epoch)
+            evaluate(model, device, loader, criterion)
+
+        return
         # Print information about the shape of the train_dataset
         print(f"Number of samples in train_dataset: {len(train_dataset) * batch_size}")
         if len(train_dataset) > 0:
@@ -84,9 +118,10 @@ def main():
 
         train_loader = DataLoader(train_dataset, batch_size=None, shuffle=True)
         test_loader = DataLoader(test_dataset, batch_size=None, shuffle=False)
-
+        print(f"Number of batches in train_loader: {len(train_loader)}")
+        print(f"Number of batches in test_loader: {len(test_loader)}")
         model = small.create_model(encoder, go_board_rows, go_board_cols, num_classes).to(device)
-        optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         criterion = torch.nn.CrossEntropyLoss()
 
         for epoch in range(1, epochs + 1):
