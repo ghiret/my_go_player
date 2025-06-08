@@ -1,41 +1,33 @@
-import tensorflow as tf
+import torch
 
 
 def validate_gpu():
-    print("TensorFlow version:", tf.__version__)
+    print("PyTorch version:", torch.__version__)
 
-    # Check for available GPUs
-    physical_devices = tf.config.list_physical_devices()
-    print("Available physical devices:")
-    for device in physical_devices:
-        print(f"  {device.device_type}: {device.name}")
+    # Check for available devices
+    if torch.cuda.is_available():
+        num_gpus = torch.cuda.device_count()
+        print(f"\nNumber of CUDA GPUs available: {num_gpus}")
+        for i in range(num_gpus):
+            print(f"  GPU {i}: {torch.cuda.get_device_name(i)}")
 
-    gpus = tf.config.list_physical_devices("GPU")
-    if gpus:
-        print(f"\nNumber of GPUs available: {len(gpus)}")
-        for gpu in gpus:
-            print(f"  {gpu.name}")
-
-        # Try to create a simple TensorFlow operation on the GPU
+        # Try to create a simple Torch operation on the GPU
         try:
-            with tf.device("/GPU:0"):
-                a = tf.constant([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
-                b = tf.constant([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
-                c = tf.matmul(a, b)
+            device = torch.device("cuda:0")
+            a = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], device=device)
+            b = torch.tensor([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], device=device)
+            c = torch.matmul(a, b)
             print("\nSuccessfully performed a GPU operation.")
-            print("Result:", c.numpy())
+            print("Result:", c.cpu().numpy())
         except RuntimeError as e:
             print("\nFailed to perform GPU operation:", str(e))
     else:
-        print("\nNo GPUs found. TensorFlow will use CPU.")
-
-    # Check if TensorFlow is using Metal
-    if tf.test.is_built_with_cuda():
-        print("\nTensorFlow is built with CUDA support (for NVIDIA GPUs).")
-    elif len(gpus) > 0:
-        print("\nTensorFlow is likely using Metal (Apple GPU).")
-    else:
-        print("\nTensorFlow is using CPU only.")
+        print("\nNo CUDA GPUs found. PyTorch will use CPU.")
+        device = torch.device("cpu")
+        a = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]], device=device)
+        b = torch.tensor([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], device=device)
+        c = torch.matmul(a, b)
+        print("\nPerformed operation on CPU. Result:", c.numpy())
 
 
 if __name__ == "__main__":

@@ -1,16 +1,18 @@
-import tensorflow as tf
-from keras.layers import Conv2D, Flatten  # <1>
+import torch
 
 
 def check_gpu_availability():
+    print("PyTorch version:", torch.__version__)
 
-    print("TensorFlow version:", tf.__version__)
-    print("Num GPUs Available: ", len(tf.config.list_physical_devices("GPU")))
-    print("Devices:", tf.config.list_physical_devices())
-
-    try:
-        tf.config.experimental.set_visible_devices(tf.config.list_physical_devices("GPU")[0], "GPU")
-        logical_gpus = tf.config.experimental.list_logical_devices("GPU")
-        print(len(logical_gpus), "Logical GPU(s) found")
-    except:
+    if torch.cuda.is_available():
+        num_gpus = torch.cuda.device_count()
+        print(f"Number of GPUs Available: {num_gpus}")
+        for i in range(num_gpus):
+            print(f"  - GPU {i}: {torch.cuda.get_device_name(i)}")
+        print(f"Current device: {torch.cuda.current_device()}")
+    else:
         print("No GPU found. Using CPU.")
+
+
+if __name__ == "__main__":
+    check_gpu_availability()

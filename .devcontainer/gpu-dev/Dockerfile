@@ -39,6 +39,6 @@ RUN UV_HTTP_TIMEOUT=600 uv pip install --python $VENV_PATH/bin/python --index-ur
 
 # Set workspace directory
 WORKDIR /workspaces/rl_resources
-
+ENV KERAS_BACKEND=torch
 # Default command
 CMD [ "sleep", "infinity" ]

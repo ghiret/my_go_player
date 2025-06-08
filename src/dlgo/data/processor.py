@@ -18,7 +18,9 @@ import sys
 import tarfile
 
 import numpy as np
-from keras.utils import to_categorical
+import torch
+from torch.nn.functional import one_hot
+from tqdm import tqdm
 
 from dlgo.board import Board
 from dlgo.data.index_processor import KGSIndex
@@ -65,8 +67,8 @@ class GoDataProcessor:
         data = sampler.draw_data(data_type, num_samples)
         zip_names = set()
         game_numbers_by_zip_name = {}
-        for filename, game_number in data:
-            print(f"filename= {filename} and game_number: {game_number}")
+        for filename, game_number in tqdm(data, desc="Processing games", unit="game"):
+            # print(f"filename= {filename} and game_number: {game_number}")
             # We collect all zip file names contained in the data in a list.
             zip_names.add(filename)
             if filename not in game_numbers_by_zip_name:
@@ -195,9 +197,10 @@ class GoDataProcessor:
                 x = np.load(feature_file)
                 y = np.load(label_file)
                 x = x.astype("float32")
-                y = to_categorical(y.astype(int), 19 * 19)
+                y = y.astype(int)
+                y_onehot = one_hot(torch.from_numpy(y), num_classes=19 * 19).numpy().astype("float32")
                 feature_list.append(x)
-                label_list.append(y)
+                label_list.append(y_onehot)
         features = np.concatenate(feature_list, axis=0)
         labels = np.concatenate(label_list, axis=0)
 

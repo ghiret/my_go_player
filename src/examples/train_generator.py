@@ -1,17 +1,10 @@
-# This is a copy of https://github.com/maxpumperla/deep_learning_and_the_game_of_go/blob/master/code/examples/train_generator.py
-"""
-This file is based on code from the book "Deep Learning and the Game of Go"
-by Max Pumperla and Kevin Ferguson (Manning Publications, 2019).
-Original code repository: https://github.com/maxpumperla/deep_learning_and_the_game_of_go
-
-The code has been modified and adapted for use with Keras 3 and TensorFlow.
-"""
 import multiprocessing
 import os
 import traceback
 
-import tensorflow as tf
-from tensorflow import keras
+import torch
+from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 from dlgo.data.processor import GoDataProcessor
 from dlgo.data.sequence import DataSequence
@@ -19,54 +12,130 @@ from dlgo.encoders.oneplane import OnePlaneEncoder
 from dlgo.networks import small
 
 
+def train(model, device, train_loader, optimizer, criterion, epoch):
+    model.train()
+    total_loss = 0
+    correct = 0
+    total = 0
+    for batch_idx, (data, target) in enumerate(tqdm(train_loader, desc=f"\033[92mEpoch {epoch} [train]\033[0m")):
+
+        data, target = data.to(device), target.to(device)
+        if epoch == 1 and batch_idx == 0:
+            print("Input stats:")
+            print("Input shape:", data.shape)
+            print("Min/Max:", data.min().item(), data.max().item())
+            print("Mean:", data.mean().item())
+        optimizer.zero_grad()
+        output = model(data)
+        if epoch == 1 and batch_idx == 0:
+            print("Model output stats:")
+            print("Output min/max:", output.min().item(), output.max().item())
+            print("Output[0]:", output[0][:10])
+        loss = criterion(output, target)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item() * data.size(0)
+        pred = output.argmax(dim=1)
+        correct += (pred == target).sum().item()
+        total += data.size(0)
+    avg_loss = total_loss / total
+    accuracy = correct / total
+    print(f"\033[92mTrain Epoch {epoch}: Loss={avg_loss:.4f}, Accuracy={accuracy:.4f}\033[0m")
+
+
+def evaluate(model, device, test_loader, criterion):
+    model.eval()
+    total_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for data, target in tqdm(test_loader, desc="\033[94m[eval]\033[0m"):
+            data, target = data.to(device), target.to(device)
+
+            output = model(data)
+            loss = criterion(output, target)
+            total_loss += loss.item() * data.size(0)
+            pred = output.argmax(dim=1)
+            correct += (pred == target).sum().item()
+            total += data.size(0)
+    avg_loss = total_loss / total
+    accuracy = correct / total
+    print(f"\033[94mTest: Loss={avg_loss:.4f}, Accuracy={accuracy:.4f}\033[0m")
+    return avg_loss, accuracy
+
+
+import torch.nn as nn
+
+
+class DummyLinear(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(19 * 19, 361)
+
+    def forward(self, x):
+        return self.fc(x.view(x.size(0), -1))
+
+
 def main():
     go_board_rows, go_board_cols = 19, 19
     num_classes = go_board_rows * go_board_cols
     num_games = 100
     batch_size = 128
+    epochs = 5
 
     encoder = OnePlaneEncoder((go_board_rows, go_board_cols))
     processor = GoDataProcessor(encoder=encoder.name())
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("Using device:", device)
 
     try:
         train_data = processor.load_go_data("train", num_games)
         test_data = processor.load_go_data("test", num_games)
 
-        train_sequence = DataSequence(processor.data_dir, train_data, batch_size, num_classes)
-        test_sequence = DataSequence(processor.data_dir, test_data, batch_size, num_classes)
+        train_dataset = DataSequence(processor.data_dir, train_data, num_classes)
+        test_dataset = DataSequence(processor.data_dir, test_data, num_classes)
 
-        # Create the model using the new function
-        model = small.create_model(encoder, go_board_rows, go_board_cols, num_classes)
+        subset = torch.utils.data.Subset(train_dataset, list(range(10)))
+        loader = torch.utils.data.DataLoader(subset, batch_size=2, shuffle=True)
 
-        # Define the checkpoint callback
-        checkpoint_callback = keras.callbacks.ModelCheckpoint(
-            "../checkpoints/small_model_epoch_{epoch}.keras", save_best_only=True, monitor="val_accuracy"
-        )
+        for epoch in range(1, 30):
+            # model = small.create_model(encoder, go_board_rows, go_board_cols, num_classes).to(device)
+            model = DummyLinear().to(device)  # Using a dummy model for testing
+            optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+            criterion = torch.nn.CrossEntropyLoss()
 
-        # Train the model
-        model.fit(train_sequence, epochs=5, validation_data=test_sequence, callbacks=[checkpoint_callback])
+            train(model, device, loader, optimizer, criterion, epoch)
+            evaluate(model, device, loader, criterion)
 
-        # Evaluate the model
-        evaluation_results = model.evaluate(test_sequence)
+        return
+        # Print information about the shape of the train_dataset
+        print(f"Number of samples in train_dataset: {len(train_dataset) * batch_size}")
+        if len(train_dataset) > 0:
+            features, labels = train_dataset[0]
+            print(f"Shape of features in first batch: {features.shape}")
+            print(f"Shape of labels in first batch: {labels.shape}")
 
-        print(f"Test loss: {evaluation_results[0]}")
-        print(f"Test accuracy: {evaluation_results[1]}")
+        train_loader = DataLoader(train_dataset, batch_size=None, shuffle=True)
+        test_loader = DataLoader(test_dataset, batch_size=None, shuffle=False)
+        print(f"Number of batches in train_loader: {len(train_loader)}")
+        print(f"Number of batches in test_loader: {len(test_loader)}")
+        model = small.create_model(encoder, go_board_rows, go_board_cols, num_classes).to(device)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+        criterion = torch.nn.CrossEntropyLoss()
+
+        for epoch in range(1, epochs + 1):
+            train(model, device, train_loader, optimizer, criterion, epoch)
+            evaluate(model, device, test_loader, criterion)
 
     except Exception as e:
         print(f"An error occurred: {e}")
         traceback.print_exc()
     finally:
-        # Clean up any resources if necessary
         pass
 
 
 if __name__ == "__main__":
-
-    # Set the start method for multiprocessing
     multiprocessing.set_start_method("spawn")
-
-    # Set the number of OpenMP threads
     os.environ["OMP_NUM_THREADS"] = "1"
-
-    # Run the main function
     main()

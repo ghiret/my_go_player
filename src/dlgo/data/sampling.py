@@ -100,7 +100,7 @@ class Sampler:
                 (filename, index) = eval(line)
                 self.test_games.append((filename, index))
 
-    def draw_training_samples(self, num_sample_games: int):
+    def draw_training_samples(self, num_sample_games: int, verbose: bool = False) -> list:
         """
         Draw a specified number of training game samples, ensuring no overlap with test games.
 
@@ -146,7 +146,8 @@ class Sampler:
             # Add each game from this file to the available_games list
             for game_number in range(num_games):
                 available_games.append((filename, game_number))
-                print((filename, game_number))  # Print each game added
+                if verbose:
+                    print((filename, game_number))  # Print each game added
 
         # Print the total number of available games
         print(f"Total number of games: {len(available_games)}")

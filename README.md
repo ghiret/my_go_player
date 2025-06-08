@@ -62,7 +62,7 @@ Depending on your platform, GPU setup varies slightly:
 
 ---
 
-#### 🧠 Apple Silicon (macOS + Metal + TensorFlow)
+#### 🧠 Apple Silicon (macOS + Metal )
 
 If you're using a Mac with Apple Silicon (M1/M2/M3), `tensorflow-metal` and `tensorflow-macos` provide GPU acceleration.
 

@@ -16,7 +16,34 @@ from dlgo.encoders.base import get_encoder_by_name
 from dlgo.utils import print_board, print_move
 
 
-def generate_game(board_size, rounds, max_moves, temperature):
+def generate_game(board_size: int, rounds: int, max_moves: int, temperature: float) -> tuple:
+    """
+    Generate a single game using MCTS.
+    Args:
+        board_size (int): Size of the Go board (e.g., 9, 13, 19).
+        rounds (int): Number of MCTS rounds to simulate for each move.
+        max_moves (int): Maximum number of moves in the game.
+        temperature (float): Temperature parameter for MCTS exploration.
+    Returns:
+        tuple: A tuple containing two numpy arrays:
+            - boards: Encoded board states.
+            - moves: One-hot encoded moves corresponding to the board states.
+    """
+    if not isinstance(board_size, int):
+        raise TypeError("Board size must be an integer.")
+    if not isinstance(rounds, int) or not isinstance(max_moves, int):
+        raise TypeError("Rounds and max_moves must be integers.")
+    if not isinstance(temperature, float):
+        raise TypeError("Temperature must be a float.")
+    if board_size not in [5, 9, 13, 19]:
+        raise ValueError("Board size must be one of 5, 9, 13, or 19.")
+    if rounds <= 0:
+        raise ValueError("Number of rounds must be a positive integer.")
+    if temperature <= 0 or temperature > 1:
+        raise ValueError("Temperature must be in the range (0, 1].")
+    if max_moves <= 0:
+        raise ValueError("Maximum moves must be a positive integer.")
+
     boards, moves = [], []
 
     encoder = get_encoder_by_name("oneplane", board_size)
@@ -60,6 +87,8 @@ def main():
 
     args = parser.parse_args()
 
+    # X correspondes to the board states, Y to the moves
+    # When we train a model X is the input and Y is the label to be predicted.
     xs = []
     ys = []
 

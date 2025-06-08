@@ -5,6 +5,8 @@
         "context": "../.."
     },
     "workspaceFolder": "/workspaces/my_go_player",
+    "remoteUser": "ubuntu",
+    "updateRemoteUserUID": true,
     "customizations": {
         "vscode": {
             "extensions": [
@@ -37,8 +39,8 @@
         "gpu": true
     },
     "runArgs": [
-        "--gpus", "all"
+        "--gpus",
+        "all"
     ],
-    "remoteUser": "ubuntu",
     "postCreateCommand": "echo 'Container is ready!'"
 }
