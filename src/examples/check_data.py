@@ -1,18 +1,19 @@
-import numpy as np
 import os
 
-data_dir = 'data' 
-features_path = os.path.join(data_dir, 'features_train.npy')
-labels_path = os.path.join(data_dir, 'labels_train.npy')
+import numpy as np
+
+data_dir = "data"
+features_path = os.path.join(data_dir, "features_train.npy")
+labels_path = os.path.join(data_dir, "labels_train.npy")
 
 print("--- Running Data Integrity Check ---")
 try:
     features = np.load(features_path)
     labels = np.load(labels_path)
-    
+
     print(f"Loaded features from: {features_path}")
     print(f"Number of features: {len(features)}")
-    
+
     print(f"Loaded labels from: {labels_path}")
     print(f"Number of labels:   {len(labels)}")
 
