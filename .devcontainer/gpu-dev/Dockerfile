@@ -1,5 +1,5 @@
 # Base image
-ARG CUDA_VERSION="12.6.2"
+ARG CUDA_VERSION="12.8.1"
 ARG UBUNTU_VERSION="24.04"
 FROM nvidia/cuda:${CUDA_VERSION}-devel-ubuntu${UBUNTU_VERSION}
 
@@ -32,13 +32,13 @@ ENV PATH="$VENV_PATH/bin:$PATH"
 COPY --chown=ubuntu:ubuntu pyproject.toml ./
 COPY --chown=ubuntu:ubuntu src ./src
 
-# Install Python dependencies using uv into venv
-RUN UV_HTTP_TIMEOUT=600 uv pip install --python $VENV_PATH/bin/python --index-url https://download.pytorch.org/whl/cu126 torch torchvision torchaudio && \
-    uv pip install --python $VENV_PATH/bin/python --no-cache-dir ".[dev]" && \
+# Install Python dependencies using uv into venv.
+# On Linux, pyproject.toml selects CUDA torch (cu128 index via [tool.uv.sources]) and jax[cuda12].
+RUN UV_HTTP_TIMEOUT=600 uv pip install --python $VENV_PATH/bin/python --no-cache-dir ".[dev]" && \
     rm -rf /tmp/project_deps/*
 
 # Set workspace directory
-WORKDIR /workspaces/rl_resources
+WORKDIR /workspaces/my_go_player
 
 # Default command
 CMD [ "sleep", "infinity" ]

@@ -10,7 +10,6 @@ from __future__ import print_function
 
 # tag::mcts_go_cnn_simple_preprocessing[]
 import numpy as np
-import tensorflow as tf
 from check_for_gpu import check_gpu_availability
 from keras.layers import Conv2D, Dense, Flatten  # <1>
 from keras.models import Sequential
