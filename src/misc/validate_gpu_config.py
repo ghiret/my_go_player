@@ -114,6 +114,9 @@ def main():
         sys.exit(0 if check_keras() else 1)
 
     os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+    # Allocate GPU memory on demand so TF, torch and JAX fit together on small GPUs.
+    os.environ.setdefault("TF_FORCE_GPU_ALLOW_GROWTH", "true")
+    os.environ.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "false")
     results = {}
     for name, check in (("tensorflow", check_tensorflow), ("torch", check_torch), ("jax", check_jax)):
         try:

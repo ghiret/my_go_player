@@ -118,4 +118,6 @@ KERAS_BACKEND=torch uv run python src/examples/train_generator.py
 
 The unit tests can be run on every backend the same way, e.g. `KERAS_BACKEND=jax uv run pytest`.
 
-> JAX pre-allocates 75% of GPU memory by default. On small GPUs, or when mixing frameworks in one process, set `XLA_PYTHON_CLIENT_PREALLOCATE=false`.
+When an NVIDIA GPU is present, `pytest` also runs `tests/gpu/test_gpu_config.py`, which fails unless TensorFlow, PyTorch, JAX and Keras on every backend run on the GPU. CI has no GPU, so this test is skipped there: **GPU support is verified locally only.**
+
+> By default JAX pre-allocates 75% of GPU memory and TensorFlow almost all of it. On small GPUs, or when mixing frameworks, set `XLA_PYTHON_CLIENT_PREALLOCATE=false` and `TF_FORCE_GPU_ALLOW_GROWTH=true` (the tests and `validate_gpu_config.py` do this for you).
