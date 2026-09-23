@@ -10,7 +10,7 @@ This has been adapted to keras v3 using Anthropic's Claude model.
 import glob
 
 import numpy as np
-from tensorflow.keras.utils import Sequence, to_categorical
+from keras.utils import Sequence, to_categorical
 
 
 class DataSequence(Sequence):

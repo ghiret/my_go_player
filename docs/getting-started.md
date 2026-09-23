@@ -31,18 +31,13 @@ This guide will help you set up and start using the Deep Learning and Go Project
    python src/misc/validate_gpu_config.py
    ```
 
-4. (Optional) On **Linux with CUDA** (e.g., Ubuntu + NVIDIA GPU):
+4. (Optional) On **Linux with CUDA** (e.g., Ubuntu + NVIDIA GPU, driver supporting CUDA 12.8+):
    ```bash
-   # If inside devcontainer, activate its venv
-   source /home/ubuntu/venv/bin/activate
-
-   # If running locally:
-   python3.11 -m venv .venv
-   source .venv/bin/activate
-
-   uv pip install ".[dev]"
-   python src/misc/validate_gpu_config.py
+   uv sync --extra dev
+   uv run python src/misc/validate_gpu_config.py --require-gpu
    ```
+   This installs CUDA-enabled PyTorch (cu128), TensorFlow and `jax[cuda12]`. Select the Keras backend with
+   `KERAS_BACKEND=jax|tensorflow|torch`.
 
 ## ✅ Verifying Installation
 

@@ -85,29 +85,39 @@ python src/misc/validate_gpu_config.py
 ```
 `tensorflow-macos` and `tensorflow-metal` will automatically be installed on macOS via `pyproject.toml` using uv's platform-aware resolution.
 
-####
+#### 🐧 Linux + NVIDIA CUDA (TensorFlow, PyTorch and JAX)
 
-If you're using a Linux system with CUDA and a supported NVIDIA driver, GPU access will work **inside devcontainers** and also **locally**.
+If you're using a Linux system with an NVIDIA GPU and a recent driver (CUDA 12.8+ capable, e.g. driver ≥ 570), GPU access works **inside the devcontainer** and **locally**. No system CUDA toolkit is needed: the CUDA/cuDNN runtime libraries come from the `nvidia-*` pip wheels.
 
 ```bash
-# Inside the devcontainer or your local machine:
-
-# Activate devcontainer's pre-created venv (if inside container)
-source /home/ubuntu/venv/bin/activate
-
-# Or: Create a venv locally (optional if not using container)
-python3.11 -m venv .venv
-source .venv/bin/activate
-
-# Install uv
+# Install uv (if needed)
 curl -LsSf https://astral.sh/uv/install.sh | sh
-sudo mv ~/.local/bin/uv /usr/local/bin/uv
 
-# Install all dependencies (dev includes test tools)
-uv pip install ".[dev]"
+# Create .venv and install the locked dependencies (dev includes test tools)
+uv sync --extra dev
 
-# Validate GPU setup
-python src/misc/validate_gpu_config.py
+# Validate GPU setup for TensorFlow, PyTorch, JAX and Keras on each backend
+uv run python src/misc/validate_gpu_config.py --require-gpu
 ```
 
-PyTorch with CUDA is pulled from the `pytorch-cu124` index if you're on Linux, thanks to the `pyproject.toml` configuration under `[tool.uv.sources]`.
+On Linux, `pyproject.toml` pulls:
+
+- **PyTorch** from the `pytorch-cu128` index (`[tool.uv.sources]`),
+- **JAX** as `jax[cuda12]` (CUDA plugin + pip-installed CUDA libraries),
+- **TensorFlow**, which reuses the same pip-installed CUDA libraries.
+
+#### 🔀 Choosing the Keras backend
+
+The Keras code (`dlgo.networks`, `dlgo.data`, `src/examples`) is backend-agnostic Keras 3. Pick the backend with the `KERAS_BACKEND` environment variable:
+
+```bash
+KERAS_BACKEND=jax uv run python src/examples/train_generator.py
+KERAS_BACKEND=tensorflow uv run python src/examples/train_generator.py
+KERAS_BACKEND=torch uv run python src/examples/train_generator.py
+```
+
+The unit tests can be run on every backend the same way, e.g. `KERAS_BACKEND=jax uv run pytest`.
+
+When an NVIDIA GPU is present, `pytest` also runs `tests/gpu/test_gpu_config.py`, which fails unless TensorFlow, PyTorch, JAX and Keras on every backend run on the GPU. CI has no GPU, so this test is skipped there: **GPU support is verified locally only.**
+
+> By default JAX pre-allocates 75% of GPU memory and TensorFlow almost all of it. On small GPUs, or when mixing frameworks, set `XLA_PYTHON_CLIENT_PREALLOCATE=false` and `TF_FORCE_GPU_ALLOW_GROWTH=true` (the tests and `validate_gpu_config.py` do this for you).

@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
-from tensorflow.keras.utils import to_categorical
+from keras.utils import to_categorical
 
 from dlgo.data.sequence import DataSequence  # Updated import path
 
